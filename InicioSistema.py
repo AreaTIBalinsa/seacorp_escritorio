@@ -4,18 +4,16 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
 from PyQt5 import QtCore, QtGui
 from PyQt5.QtWidgets import QMainWindow
-import sys
 import serial
 import time
 import socket
-from datetime import datetime
-import sys
+from datetime import datetime, timedelta, date
 import cv2
 from pyzbar.pyzbar import decode
 
 from View.Ui_Principal import Ui_MainWindow
+import ModalInicio
 import pulsosArduino
-from View.Ui_modal_alerta import Ui_modalAlerta as Modal_Alerta
 
 # Importación de Base de Datos
 import DataBase.database_conexion # El archivo database_conexion.py
@@ -24,33 +22,29 @@ import DataBase.database_conexion # El archivo database_conexion.py
 COMARDUINO = ""
 COMINDICADOR = ""
 
-seleccionarTalloSolo = False
-seleccionarTalloCoral = False
-seleccionarMediaValvaTs = False
-seleccionarMediaValvaTc = False
-seleccionarOtros = False
-
-lblReestablecer = False
-lblApagar = False
-lblIniciarProceso = False
-
-seleccionarTalloSolo = False
-seleccionarTalloCoral = False
-seleccionarMediaValvaTs = False
-seleccionarMediaValvaTc = False
-seleccionarOtros = False
-
-lblReestablecer = False
-lblApagar = False
-lblIniciarProceso = False
+listoParaAccionar = False
 
 captaCodigo = False
+captaCodigoQr = False
+
+seleccionarTalloSolo = False
+seleccionarTalloCoral = False
+seleccionarMediaValvaTs = False
+seleccionarMediaValvaTc = False
+seleccionarOtros = False
+
+# Variables Base de Datos
 pesoMaximo = 0
 pesoTara = 0
 pesoExcedido = 0
 presentacion = ""
-fechaPeso = ""
-horaPeso = datetime.now().strftime('%H:%M:%S')
+fechaInicioProceso = ""
+horaInicioProceso = ""
+horaInicioLote = ""
+numeroProceso = 0
+numeroLote = 0
+acumuladoProceso = 0
+acumuladoLote = 0
 
 pesoMaximoTalloSolo = 0
 pesoMaximoTalloCoral = 0
@@ -68,6 +62,10 @@ frmEditarTaraAlerta = False
 frmEditarPesadaAlerta = False
 frmDescuentoAlerta = False
 frmFinalizarAlerta = False
+
+frmIngresarNuevaTara = False
+
+presentacionEditarTara = 0
 
 # Variables de rutas de imagenes para alerta
 correcto = "Resources/correcto.png"
@@ -262,22 +260,22 @@ class WorkerThreadFechaHora(QThread):
 # Creación de la Clase Principal
 # ===============================
 
-class InicioSistema(QMainWindow):
+class AplicacionPrincipal(QMainWindow):
     def __init__(self):
         super().__init__()
         self.ui = Ui_MainWindow()
         self.conexion = DataBase.database_conexion.Conectar()
-        self.modal_alerta = Modal_Alerta()
+        self.modal_Inicio = ModalInicio.ModalPrincipal()
         
         # self.pulsosArduino = pulsosArduino
         
-        self.cap = cv2.VideoCapture(0)
-        self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, 270)
-        self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 200)
+        # self.cap = cv2.VideoCapture(0)
+        # self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, 270)
+        # self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 200)
 
-        self.timer = QTimer()
-        self.timer.timeout.connect(self.update_frame)
-        self.timer.start(30)
+        # self.timer = QTimer()
+        # self.timer.timeout.connect(self.update_frame)
+        # self.timer.start(30)
         
         self.ui.setupUi(self)
         self.setWindowFlag(QtCore.Qt.FramelessWindowHint)
@@ -288,6 +286,7 @@ class InicioSistema(QMainWindow):
         self.ui.imgPanera.setPixmap(QPixmap("Resources/panera.png"))
         self.ui.imgFlechaDerecha.setPixmap(QPixmap("Resources/flecha.png"))
         self.ui.imgFlechaIzquierda.setPixmap(QPixmap("Resources/flecha.png"))
+        self.ui.imgFinalizar.setPixmap(QPixmap("Resources/error.png"))
         
         self.workerFechaHora = WorkerThreadFechaHora()
         self.workerFechaHora.start() # Iniciamos el hilo
@@ -304,6 +303,8 @@ class InicioSistema(QMainWindow):
         
         self.fn_asignaPesosMaximosYTaras()
         
+        self.ui.txtCodigoColaborador.textChanged.connect(self.fn_recepcionaCodigoColaborador)
+        
         self.ui.imgPanera.setHidden(True)
         self.ui.txtCodigoColaborador.setEnabled(False)
         self.ui.txtCodigoColaborador.setFocus(False)
@@ -312,10 +313,23 @@ class InicioSistema(QMainWindow):
         self.ui.lblIndicadorPlataforma.setText("-----")
         
         self.ui.frmEditarTaraAlerta.setHidden(True)
+        self.ui.frmFinalizarAlerta.setHidden(True)
+        self.ui.frmIngresarNuevaTara.setHidden(True)
         self.ui.frmSombra.setHidden(True)
         self.ui.frmAlerta.setHidden(True)
         
-        self.fn_modal_alerta()
+        self.tablaDePesos = self.ui.tblDetallePesadas
+        self.tablaDePesos.setColumnWidth(0, 100)
+        self.tablaDePesos.setColumnWidth(1, 250)
+        self.tablaDePesos.setColumnWidth(2, 180)
+        self.tablaDePesos.setColumnWidth(3, 100)
+        self.tablaDePesos.setColumnWidth(4, 100)
+        self.tablaDePesos.setColumnWidth(5, 100)
+        self.tablaDePesos.setColumnWidth(6, 100)
+        self.tablaDePesos.setColumnWidth(7, 100)
+        self.tablaDePesos.setColumnWidth(8, 100)
+        self.tablaDePesos.setColumnWidth(9, 80)
+        self.tablaDePesos.setColumnHidden(10, True)
         
     def update_frame(self):
         ret, frame = self.cap.read()
@@ -326,8 +340,9 @@ class InicioSistema(QMainWindow):
             for qr_code in qr_codes:
                 qr_data = qr_code.data.decode('utf-8')
                 
-                if(captaCodigo):
+                if(captaCodigo and captaCodigoQr):
                     self.ui.txtCodigoColaborador.setText(qr_data)
+                    self.ui.txtCodigoColaborador.setFocus(True)
                 else:
                     self.ui.txtCodigoColaborador.setText("")
                 
@@ -352,30 +367,64 @@ class InicioSistema(QMainWindow):
     def mostrar_fecha(self,val):
         self.ui.lblFecha.setText(val)
         
-    def fn_modal_alerta(self):
+    def fn_validarEntradaNumerica(self):
+        sender = self.sender()
+
+        if sender is not None and isinstance(sender, QLineEdit):
+            texto = sender.text()
+
+            texto_valido = ''.join(filter(str.isdigit, texto))
+
+            sender.setText(texto_valido)
         
-        self.dialog_modal_alerta = QDialog(self)
-        # dialog_modal_alerta.setWindowIcon(QtGui.QIcon(imagen))
-        self.dialog_modal_alerta.setWindowIcon(QtGui.QIcon("Resources/icon.jpg"))
-        self.modal_alerta.setupUi(self.dialog_modal_alerta)
-        self.dialog_modal_alerta.setWindowFlag(QtCore.Qt.FramelessWindowHint)
-        self.modal_alerta.labelFondoSistema.setPixmap(QPixmap("Resources/conchas.png"))
-        self.modal_alerta.lblImgTalloSolo.setPixmap(QPixmap("Resources/tallo_solo.png"))
-        self.modal_alerta.lblImgTalloCoral.setPixmap(QPixmap("Resources/tallo_coral.png"))
-        self.modal_alerta.lblImgMediaValvaTs.setPixmap(QPixmap("Resources/media_valva.png"))
-        self.modal_alerta.lblImgMediaValvaTc.setPixmap(QPixmap("Resources/media_valva.png"))
-        self.modal_alerta.lblImgOtros.setPixmap(QPixmap("Resources/media_valva.png"))
-        self.modal_alerta.lblImgReestablecer.setPixmap(QPixmap("Resources/reestablecer.png"))
-        self.modal_alerta.lblImgApagar.setPixmap(QPixmap("Resources/off_ok.png"))
-        self.modal_alerta.lblImgIniciarProceso.setPixmap(QPixmap("Resources/iniciar.png"))
+    def fn_modal_principal(self):
+        global pesoMaximo
+        global pesoTara
+        global presentacion
+        global codigoColaborador
+        global numeroProceso
+        global numeroLote
+        global fechaInicioProceso
+        global horaInicioProceso
+        global horaInicioLote
+        global acumuladoProceso
+        global acumuladoLote
+        global seleccionarTalloSolo
+        global seleccionarTalloCoral
+        global seleccionarMediaValvaTs
+        global seleccionarMediaValvaTc
+        global seleccionarOtros
         
-        # self.modal_alerta.modal_lblAlertaTitulo.setText(titulo)
+        self.fn_seleccionarEspecie(0)
+        pesoMaximo = 0
+        pesoTara = 0
+        presentacion = ""
+        codigoColaborador = 0
+        numeroProceso = 0
+        numeroLote = 0
+        fechaInicioProceso = ""
+        horaInicioProceso = ""
+        horaInicioLote = ""
+        acumuladoProceso = 0
+        acumuladoLote = 0
         
-        self.dialog_modal_alerta.keyReleaseEvent = self.keyReleaseEvent
-        self.dialog_modal_alerta.exec_()
+        seleccionarTalloSolo = False
+        seleccionarTalloCoral = False
+        seleccionarMediaValvaTs = False
+        seleccionarMediaValvaTc = False
+        seleccionarOtros = False
+        
+        if not self.modal_Inicio:
+            self.modal_Inicio = ModalInicio.ModalPrincipal()
+        elif not self.modal_Inicio.isVisible():
+            self.modal_Inicio.show()
+        else:
+            self.modal_Inicio.showNormal()
+            self.modal_Inicio.activateWindow()
         
     def fn_actualizar_peso(self, val):
         global captaCodigo
+        global captaCodigoQr
         global pesoExcedido
         
         try:
@@ -398,6 +447,7 @@ class InicioSistema(QMainWindow):
                 self.ui.txtCodigoColaborador.setText("")
                     
                 captaCodigo = False
+                captaCodigoQr = False
                 pesoExcedido = 0
             else:
                 pesoIndicador = pesoIndicador - pesoTara
@@ -412,16 +462,15 @@ class InicioSistema(QMainWindow):
                         self.ui.txtCodigoColaborador.setEnabled(True)
                         self.ui.txtCodigoColaborador.setFocus(True)
                         captaCodigo = True
+                        captaCodigoQr = True
                     
                     if pesoIndicador >= pesoMaximo and pesoMaximo != 0:
                         self.ui.lblPesoIndicador.setText(str(format(pesoMaximo, ".3f")))
                         self.ui.lblIndicadorPlataforma.setText(str(format(pesoMaximo, ".3f")))
                         pesoExcedido = pesoIndicador - pesoMaximo
-                        self.ui.txtCodigoColaborador.setFocus(True)
                     else:
                         self.ui.lblPesoIndicador.setText(format(pesoIndicador, ".3f"))
                         self.ui.lblIndicadorPlataforma.setText(format(pesoIndicador, ".3f"))
-                        self.ui.txtCodigoColaborador.setFocus(True)
                 else:
                     self.ui.imgPanera.setHidden(True)
                     self.ui.imgFlechaDerecha.setHidden(False)
@@ -433,6 +482,7 @@ class InicioSistema(QMainWindow):
                     self.ui.txtCodigoColaborador.setText("")
                     
                     captaCodigo = False
+                    captaCodigoQr = False
                     pesoExcedido = 0
                     
                     self.ui.lblPesoIndicador.setText(format(pesoIndicador, ".3f"))
@@ -448,30 +498,7 @@ class InicioSistema(QMainWindow):
             self.ui.lblEstadoIndicador.setStyleSheet("background-color: rgb(255, 0, 0); border-radius: 10px;")
         elif (val == "1"):
             self.ui.lblEstadoIndicador.setStyleSheet("background-color: rgb(20, 180, 60); border-radius: 10px;")
-
-    # ======================== Eventos con el Teclado ========================
-    
-    def condiciones_base(self):
-        return (
-            not frmEditarTaraAlerta and
-            not frmEditarPesadaAlerta and
-            not frmDescuentoAlerta and
-            not frmFinalizarAlerta
-        )
-        
-    def condiciones_alertas(self):
-        return (
-            not self.ui.frmEditarTaraAlerta.isVisible() and
-            not self.ui.frmSombra.isVisible() and
-            not self.ui.frmAlerta.isVisible()
-        )
-        
-    def condiciones_alertas_sombra(self):
-        return (
-            not self.ui.frmEditarTaraAlerta.isVisible() and
-            not self.ui.frmSombra.isVisible()
-        )
-        
+            
     def fn_alerta(self,titulo,imagen,mensaje,tiempo = 500):
         if imagen == correcto:
             self.ui.lblAlertaTitulo.setStyleSheet("color: #24D315")
@@ -491,98 +518,197 @@ class InicioSistema(QMainWindow):
         if self.condiciones_alertas_sombra():
             timer2 = QtCore.QTimer()
             timer2.singleShot(tiempo, lambda: self.ui.frmSombra.setHidden(True))
+
+    # ======================== Eventos con el Teclado ========================
+    
+    def condiciones_base(self):
+        return (
+            not frmEditarTaraAlerta and
+            not frmEditarPesadaAlerta and
+            not frmDescuentoAlerta and
+            not frmFinalizarAlerta and
+            not frmIngresarNuevaTara
+        )
+        
+    def condiciones_alertas(self):
+        return (
+            not self.ui.frmEditarTaraAlerta.isVisible() and
+            not self.ui.frmFinalizarAlerta.isVisible() and
+            not self.ui.frmIngresarNuevaTara.isVisible() and
+            not self.ui.frmSombra.isVisible() and
+            not self.ui.frmAlerta.isVisible()
+        )
+        
+    def condiciones_alertas_sombra(self):
+        return (
+            not self.ui.frmEditarTaraAlerta.isVisible() and
+            not self.ui.frmFinalizarAlerta.isVisible() and
+            not self.ui.frmIngresarNuevaTara.isVisible()
+        )
          
     def keyReleaseEvent(self, event):
         
-        global seleccionarTalloSolo
-        global seleccionarTalloCoral
-        global seleccionarMediaValvaTs
-        global seleccionarMediaValvaTc
-        global seleccionarOtros
-        global seleccionarlblReestablecer
-        global seleccionarlblApagar
-        global seleccionarlblIniciarProceso
-            
-        if event.key() == Qt.Key_1:
-            if not seleccionarTalloSolo:
-                seleccionarTalloSolo = True
-                self.modal_alerta.lblTalloSolo.setStyleSheet("background-color: rgb(20, 180, 60);""border-radius: 10px;""border: none;""color: rgb(255, 255, 255);""padding-left: 40;")
-            else:
-                seleccionarTalloSolo = False
-                self.modal_alerta.lblTalloSolo.setStyleSheet("background-color: rgb(255, 207, 11);""border-radius: 10px;""border: none;""color: rgb(255, 255, 255);""padding-left: 40;")
-            
-        if event.key() == Qt.Key_2:
-            if not seleccionarTalloCoral:
-                seleccionarTalloCoral = True
-                self.modal_alerta.lblTalloCoral.setStyleSheet("background-color: rgb(20, 180, 60);""border-radius: 10px;""border: none;""color: rgb(255, 255, 255);""padding-left: 55;")
-            else:
-                seleccionarTalloCoral = False
-                self.modal_alerta.lblTalloCoral.setStyleSheet("background-color: rgb(255, 207, 11);""border-radius: 10px;""border: none;""color: rgb(255, 255, 255);""padding-left: 55;")
-            
-        if event.key() == Qt.Key_3:
-            if not seleccionarMediaValvaTs:
-                seleccionarMediaValvaTs = True
-                self.modal_alerta.lblMediaValvaTs.setStyleSheet("background-color: rgb(20, 180, 60);""border-radius: 10px;""border: none;""color: rgb(255, 255, 255);""padding-left: 50;")
-            else:
-                seleccionarMediaValvaTs = False
-                self.modal_alerta.lblMediaValvaTs.setStyleSheet("background-color: rgb(255, 207, 11);""border-radius: 10px;""border: none;""color: rgb(255, 255, 255);""padding-left: 50;")
-            
-        if event.key() == Qt.Key_4:
-            if not seleccionarMediaValvaTc:
-                seleccionarMediaValvaTc = True
-                self.modal_alerta.lblMediaValvaTc.setStyleSheet("background-color: rgb(20, 180, 60);""border-radius: 10px;""border: none;""color: rgb(255, 255, 255);""padding-left: 50;")
-            else:
-                seleccionarMediaValvaTc = False
-                self.modal_alerta.lblMediaValvaTc.setStyleSheet("background-color: rgb(255, 207, 11);""border-radius: 10px;""border: none;""color: rgb(255, 255, 255);""padding-left: 50;")
-            
-        if event.key() == Qt.Key_5:
-            if not seleccionarOtros:
-                seleccionarOtros = True
-                self.modal_alerta.lblOtros.setStyleSheet("background-color: rgb(20, 180, 60);""border-radius: 10px;""border: none;""color: rgb(255, 255, 255);""padding-left: 30;")
-            else:
-                seleccionarOtros = False
-                self.modal_alerta.lblOtros.setStyleSheet("background-color: rgb(255, 207, 11);""border-radius: 10px;""border: none;""color: rgb(255, 255, 255);""padding-left: 30;")
-            
-        if event.key() == Qt.Key_6:
-            seleccionarTalloSolo = False
-            seleccionarTalloCoral = False
-            seleccionarMediaValvaTs = False
-            seleccionarMediaValvaTc = False
-            seleccionarOtros = False
-            
-            self.modal_alerta.lblTalloSolo.setStyleSheet("background-color: rgb(255, 207, 11);""border-radius: 10px;""border: none;""color: rgb(255, 255, 255);""padding-left: 40;")
-            self.modal_alerta.lblTalloCoral.setStyleSheet("background-color: rgb(255, 207, 11);""border-radius: 10px;""border: none;""color: rgb(255, 255, 255);""padding-left: 55;")
-            self.modal_alerta.lblMediaValvaTs.setStyleSheet("background-color: rgb(255, 207, 11);""border-radius: 10px;""border: none;""color: rgb(255, 255, 255);""padding-left: 50;")
-            self.modal_alerta.lblMediaValvaTc.setStyleSheet("background-color: rgb(255, 207, 11);""border-radius: 10px;""border: none;""color: rgb(255, 255, 255);""padding-left: 50;")
-            self.modal_alerta.lblOtros.setStyleSheet("background-color: rgb(255, 207, 11);""border-radius: 10px;""border: none;""color: rgb(255, 255, 255);""padding-left: 30;")
-            
-        if event.key() == Qt.Key_7:
-            if self.dialog_modal_alerta is not None:
-                self.dialog_modal_alerta.close()
+        global frmEditarTaraAlerta
+        global frmEditarPesadaAlerta
+        global frmDescuentoAlerta
+        global frmFinalizarAlerta
         
-        if event.key() == Qt.Key_0:
-            pass
+        global frmIngresarNuevaTara
+        
+        global presentacionEditarTara
         
         if not self.ui.txtCodigoColaborador.hasFocus():
-            if (event.key() == Qt.Key_1) and self.condiciones_base() and self.condiciones_alertas():
+            self.setFocus()
+            
+            if (event.key() == Qt.Key_1) and self.condiciones_base() and self.condiciones_alertas() and seleccionarTalloSolo:
                 self.fn_seleccionarEspecie(1)
                 
-            if (event.key() == Qt.Key_2) and self.condiciones_base() and self.condiciones_alertas():
+            if (event.key() == Qt.Key_2) and self.condiciones_base() and self.condiciones_alertas() and seleccionarTalloCoral:
                 self.fn_seleccionarEspecie(2)
             
-            if (event.key() == Qt.Key_3) and self.condiciones_base() and self.condiciones_alertas():
+            if (event.key() == Qt.Key_3) and self.condiciones_base() and self.condiciones_alertas() and seleccionarMediaValvaTs:
                 self.fn_seleccionarEspecie(3)
             
-            if (event.key() == Qt.Key_4) and self.condiciones_base() and self.condiciones_alertas():
+            if (event.key() == Qt.Key_4) and self.condiciones_base() and self.condiciones_alertas() and seleccionarMediaValvaTc:
                 self.fn_seleccionarEspecie(4)
             
-            if (event.key() == Qt.Key_5) and self.condiciones_base() and self.condiciones_alertas():
+            if (event.key() == Qt.Key_5) and self.condiciones_base() and self.condiciones_alertas() and seleccionarOtros:
                 self.fn_seleccionarEspecie(5)
                 
-            # if (event.key() == Qt.Key_Enter or event.key() == Qt.Key_Return) and self.condiciones_base() and self.condiciones_alertas():
-            #     pass
+            if (event.key() == Qt.Key_1) and self.ui.frmFinalizarAlerta.isVisible() and frmFinalizarAlerta:
+                if acumuladoLote != 0:
+                    self.fn_finalizarLote()
+                    self.ui.frmSombra.setHidden(True)
+                    self.ui.frmFinalizarAlerta.setHidden(True)
+                    frmFinalizarAlerta = False
+                    self.fn_alerta("¡LOTE FINALIZADO!",correcto,"Se ha finalizado el lote correctamente.",2000)
+                else:
+                    self.fn_alerta("¡ERROR AL FINALIZAR LOTE!",error,"No se ha acumulado ningún peso en el lote.",2000)
+            
+            if (event.key() == Qt.Key_2) and self.ui.frmFinalizarAlerta.isVisible() and frmFinalizarAlerta:
+                self.fn_finalizarProceso()
+                self.ui.frmSombra.setHidden(True)
+                self.ui.frmFinalizarAlerta.setHidden(True)
+                frmFinalizarAlerta = False
+                
+            if (event.key() == Qt.Key_3) and self.ui.frmFinalizarAlerta.isVisible() and frmFinalizarAlerta:
+                self.ui.frmSombra.setHidden(True)
+                self.ui.frmFinalizarAlerta.setHidden(True)
+                frmFinalizarAlerta = False
+                
+            if (event.key() == Qt.Key_1) and self.ui.frmEditarTaraAlerta.isVisible() and frmEditarTaraAlerta:
+                presentacionEditarTara = 1
+                frmEditarTaraAlerta = False
+                self.ui.frmEditarTaraAlerta.setHidden(True)
+                frmIngresarNuevaTara = True
+                self.ui.frmIngresarNuevaTara.setHidden(False)
+                self.ui.txtIngresarNuevaTara.setFocus(True)
+            
+            if (event.key() == Qt.Key_2) and self.ui.frmEditarTaraAlerta.isVisible() and frmEditarTaraAlerta:
+                presentacionEditarTara = 2
+                frmEditarTaraAlerta = False
+                self.ui.frmEditarTaraAlerta.setHidden(True)
+                frmIngresarNuevaTara = True
+                self.ui.frmIngresarNuevaTara.setHidden(False)
+                self.ui.txtIngresarNuevaTara.setFocus(True)
+            
+            if (event.key() == Qt.Key_3) and self.ui.frmEditarTaraAlerta.isVisible() and frmEditarTaraAlerta:
+                presentacionEditarTara = 3
+                frmEditarTaraAlerta = False
+                self.ui.frmEditarTaraAlerta.setHidden(True)
+                frmIngresarNuevaTara = True
+                self.ui.frmIngresarNuevaTara.setHidden(False)
+                self.ui.txtIngresarNuevaTara.setFocus(True)
+            
+            if (event.key() == Qt.Key_4) and self.ui.frmEditarTaraAlerta.isVisible() and frmEditarTaraAlerta:
+                presentacionEditarTara = 4
+                frmEditarTaraAlerta = False
+                self.ui.frmEditarTaraAlerta.setHidden(True)
+                frmIngresarNuevaTara = True
+                self.ui.frmIngresarNuevaTara.setHidden(False)
+                self.ui.txtIngresarNuevaTara.setFocus(True)
+            
+            if (event.key() == Qt.Key_5) and self.ui.frmEditarTaraAlerta.isVisible() and frmEditarTaraAlerta:
+                presentacionEditarTara = 5
+                frmEditarTaraAlerta = False
+                self.ui.frmEditarTaraAlerta.setHidden(True)
+                frmIngresarNuevaTara = True
+                self.ui.frmIngresarNuevaTara.setHidden(False)
+                self.ui.txtIngresarNuevaTara.setFocus(True)
+                
+            # ===== Eventos para Abrir los Frame Principales =====
+                
+            if (event.key() == Qt.Key_9) and self.condiciones_base() and self.condiciones_alertas():
+                self.ui.frmSombra.setHidden(False)
+                self.ui.frmFinalizarAlerta.setHidden(False)
+                frmFinalizarAlerta = True
+            
+            if (event.key() == Qt.Key_6) and self.condiciones_base() and self.condiciones_alertas():
+                self.ui.frmSombra.setHidden(False)
+                self.ui.frmEditarTaraAlerta.setHidden(False)
+                frmEditarTaraAlerta = True
+                presentacionEditarTara = 0
+                self.ui.txtIngresarNuevaTara.setText("")
+                
+            # ====================================================
+                
+        if self.ui.txtCodigoColaborador.hasFocus():
+            if (event.key() == Qt.Key_Enter or event.key() == Qt.Key_Return) and self.condiciones_base() and self.condiciones_alertas():
+                try:
+                    pesoIndicador = float(self.ui.lblPesoIndicador.text())
+                    if presentacion != "":
+                        if pesoIndicador > 0:
+                            if codigoColaborador != 0:
+                                self.fn_guardarPesada()
+                            else:
+                                self.fn_alerta("¡ERROR AL REGISTRAR!",error,"Debe seleccionar un colaborador.",1000)
+                        else:
+                            self.fn_alerta("¡ERROR AL REGISTRAR!",error,"El peso no puede ser 0.",1000)
+                    else:
+                        self.fn_alerta("¡ERROR AL REGISTRAR!",error,"Debe seleccionar una presentación.",1000)
+                except ValueError:
+                    print("El valor del peso no es válido")
+                    
+        if (event.key() == Qt.Key_Minus):
+            if (self.ui.frmEditarTaraAlerta.isVisible()):
+                self.ui.frmSombra.setHidden(True)
+                self.ui.frmEditarTaraAlerta.setHidden(True)
+                frmEditarTaraAlerta = False
+            if (self.ui.frmIngresarNuevaTara.isVisible()):
+                self.ui.frmSombra.setHidden(True)
+                self.ui.frmIngresarNuevaTara.setHidden(True)
+                frmIngresarNuevaTara = False
     
     # ======================== Termina eventos con el Teclado ========================
+    
+    def fn_recepcionaCodigoColaborador(self):
+        global codigoColaborador
+        
+        sender = self.sender()
+
+        if sender is not None and isinstance(sender, QLineEdit):
+            texto = sender.text()
+
+            texto_valido = ''.join(filter(str.isdigit, texto))
+
+            sender.setText(texto_valido)
+        
+        txtCodigoColaborador = self.ui.txtCodigoColaborador.text()
+
+        if (txtCodigoColaborador != "" and len(txtCodigoColaborador) >= 1):
+
+            nombreClienteSeleccionar = self.conexion.db_buscaCliente(txtCodigoColaborador)
+
+            if (len(nombreClienteSeleccionar) > 0):
+                self.ui.txtNombreDelColaborador.setText(str(nombreClienteSeleccionar[0][0]))
+                codigoColaborador = nombreClienteSeleccionar[0][1]
+            else:
+                self.ui.txtNombreDelColaborador.setText("COLABORADOR NO ENCONTRADO")
+                codigoColaborador = 0
+                
+        else:
+            self.ui.txtNombreDelColaborador.setText("*****")
+            codigoColaborador = 0
     
     def fn_asignaPesosMaximosYTaras(self):
         global pesoMaximoTalloSolo
@@ -614,6 +740,18 @@ class InicioSistema(QMainWindow):
             
             pesoMaximoOtros = float(pesosPesosMaximosYTaras[4][0])
             pesoTaraOtros = float(pesosPesosMaximosYTaras[4][1])
+            
+            self.ui.txtPesoMaximoTalloSolo.setText(f"P. Max: {format(pesoMaximoTalloSolo, '.3f')} Kg")
+            self.ui.txtPesoMaximoTalloCoral.setText(f"P. Max: {format(pesoMaximoTalloCoral, '.3f')} Kg")
+            self.ui.txtPesoMaximoMediaValvaTalloSolo.setText(f"P. Max: {format(pesoMaximoMediaValvaTalloSolo, '.3f')} Kg")
+            self.ui.txtPesoMaximoMediaValvaTalloCoral.setText(f"P. Max: {format(pesoMaximoMediaValvaTalloCoral, '.3f')} Kg")
+            self.ui.txtPesoMaximoOtros.setText(f"P. Max: {format(pesoMaximoOtros, '.3f')} Kg")
+            
+            self.ui.txtTaraTalloSolo.setText(f"Tara: {format(pesoTaraTalloSolo*1000, '.0f')} Gr")
+            self.ui.txtTaraTalloCoral.setText(f"Tara: {format(pesoTaraTalloCoral*1000, '.0f')} Gr")
+            self.ui.txtTaraMediaValvaTalloSolo.setText(f"Tara: {format(pesoTaraMediaValvaTalloSolo*1000, '.0f')} Gr")
+            self.ui.txtTaraMediaValvaTalloCoral.setText(f"Tara: {format(pesoTaraMediaValvaTalloCoral*1000, '.0f')} Gr")
+            self.ui.txtTaraOtros.setText(f"Tara: {format(pesoTaraOtros*1000, '.0f')} Gr")
         except Exception as e:
             self.fn_alerta("¡ERROR!",error,"No se pudieron obtener los precios del cliente.", 2000)
     
@@ -653,12 +791,173 @@ class InicioSistema(QMainWindow):
             pesoTara = pesoTaraOtros
             presentacion = "OTROS"
             self.ui.lblOtros.setStyleSheet("background-color: rgb(255, 207, 11); color: #000")
+
+    def fn_verificarProceso(self):
+        global numeroProceso
+        global numeroLote
+        global fechaInicioProceso
+        global horaInicioProceso
+        global horaInicioLote
+        global acumuladoProceso
+        global acumuladoLote
+
+        resultadoProceso = self.conexion.db_verificarProceso()
+
+        if resultadoProceso and resultadoProceso[3] == 0:
+            numeroProceso = resultadoProceso[0]
+            fechaInicioProceso = resultadoProceso[1]
+            horaInicioProceso = resultadoProceso[2]
+
+            resultadoAcumuladoProceso = self.conexion.db_traerAcumuladoProceso(numeroProceso)
+            acumuladoProceso = resultadoAcumuladoProceso if resultadoAcumuladoProceso is not None else 0
+
+            resultadoLote = self.conexion.db_verificarLote(numeroProceso)
+
+            if resultadoLote is None:
+                numeroLote = 1
+                acumuladoLote = 0
+                horaInicioLote = datetime.now().strftime('%H:%M:%S')
+                self.conexion.db_crearNuevoLote(numeroLote, numeroProceso, horaInicioLote)
+            else:
+                if resultadoLote[1] == 1:
+                    numeroLote = resultadoLote[0] + 1
+                    acumuladoLote = 0
+                    horaInicioLote = datetime.now().strftime('%H:%M:%S')
+                    self.conexion.db_crearNuevoLote(numeroLote, numeroProceso, horaInicioLote)
+                else:
+                    numeroLote = resultadoLote[0]
+                    horaInicioLote = resultadoLote[2]
+                    resultadoAcumuladoLote = self.conexion.db_traerAcumuladoLote(numeroProceso, numeroLote)
+                    acumuladoLote = resultadoAcumuladoLote if resultadoAcumuladoLote is not None else 0
+        else:
+            if resultadoProceso and resultadoProceso[0]:
+                numeroProceso = resultadoProceso[0] + 1
+            else:
+                numeroProceso = 1
+            acumuladoProceso = 0
+            fechaInicioProceso = datetime.now().strftime('%Y-%m-%d')
+            horaInicioProceso = datetime.now().strftime('%H:%M:%S')
+            self.conexion.db_crearNuevoProceso(numeroProceso, fechaInicioProceso, horaInicioProceso)
+
+            numeroLote = 1
+            acumuladoLote = 0
+            horaInicioLote = datetime.now().strftime('%H:%M:%S')
+            self.conexion.db_crearNuevoLote(numeroLote, numeroProceso, horaInicioLote)
+
+        if isinstance(fechaInicioProceso, str):
+            fechaInicioProceso_str = datetime.strptime(fechaInicioProceso, '%Y-%m-%d').strftime('%d/%m')
+        elif isinstance(fechaInicioProceso, date):
+            fechaInicioProceso_str = fechaInicioProceso.strftime('%d/%m')
+            
+        if isinstance(horaInicioProceso, str):
+            horaInicioProceso_str = datetime.strptime(horaInicioProceso, '%H:%M:%S').strftime('%I:%M %p')
+        elif isinstance(horaInicioProceso, timedelta):
+            horaInicioProceso_str = (datetime.min + horaInicioProceso).strftime('%I:%M %p')
+
+        if isinstance(horaInicioLote, str):
+            horaInicioLote_str = datetime.strptime(horaInicioLote, '%H:%M:%S').strftime('%I:%M %p')
+        elif isinstance(horaInicioLote, timedelta):
+            horaInicioLote_str = (datetime.min + horaInicioLote).strftime('%I:%M %p')
+
+        self.ui.txtNumeroProceso.setText(str(numeroProceso))
+        self.ui.txtNumeroLote.setText(str(numeroLote))
+        self.ui.lblHoraInicioProceso.setText(f"FECHA {fechaInicioProceso_str} | HORA INICIO: {horaInicioProceso_str}")   
+        self.ui.lblHoraInicioLote.setText(f"HORA INICIO: {horaInicioLote_str}")
+        self.ui.txtAcumuladoPorProceso.setText(str(acumuladoProceso))
+        self.ui.txtAcumuladoPorLote.setText(str(acumuladoLote))
+        
+    def fn_guardarPesada(self):
+        global captaCodigo
+        global pesoExcedido
+        global captaCodigoQr
+        
+        pesoIndicador = self.ui.lblPesoIndicador.text()
+        horaPeso = datetime.now().strftime('%H:%M:%S')
+        
+        self.conexion.db_guardarPesada(numeroProceso, numeroLote, presentacion, pesoIndicador, pesoTara, horaPeso, fechaInicioProceso, codigoColaborador, pesoExcedido)
+        self.fn_alerta("REGISTRO CORRECTO!",correcto,"El registro se ha guardado correctamente.")
+        
+        self.ui.txtCodigoColaborador.setEnabled(False)
+        self.ui.txtCodigoColaborador.setFocus(False)
+        self.ui.txtCodigoColaborador.setText("")
+        
+        captaCodigo = True
+        captaCodigoQr = False
+        pesoExcedido = 0
+        self.fn_listarPesadas()
+        
+    def fn_listarPesadas(self):
+        global acumuladoProceso
+        global acumuladoLote
+        global listoParaAccionar
+        
+        resultadoAcumuladoProceso = self.conexion.db_traerAcumuladoProceso(numeroProceso)
+        acumuladoProceso = resultadoAcumuladoProceso if resultadoAcumuladoProceso is not None else 0
+        
+        resultadoAcumuladoLote = self.conexion.db_traerAcumuladoLote(numeroProceso, numeroLote)
+        acumuladoLote = resultadoAcumuladoLote if resultadoAcumuladoLote is not None else 0
+        
+        self.ui.txtAcumuladoPorProceso.setText(str(acumuladoProceso))
+        self.ui.txtAcumuladoPorLote.setText(str(acumuladoLote))
+        
+        self.tablaDePesos.clearContents()
+        self.tablaDePesos.setRowCount(0)
+        
+        pesosListarTabla = self.conexion.db_listarPesosTabla(fechaInicioProceso, numeroProceso, numeroLote)
+        
+        listoParaAccionar = False
+        
+        if pesosListarTabla != "" and pesosListarTabla != None:
+            if len(pesosListarTabla) > 0:
+                
+                listoParaAccionar = True
+            
+                for row_number, row_data in enumerate(pesosListarTabla):
+                    
+                        self.tablaDePesos.insertRow(row_number)
+                        
+                        for column_number, data in enumerate(row_data):
+                            
+                            if column_number == 0:  # Columna de "correlativo"
+                                data = (row_number - len(pesosListarTabla))*-1
+                                
+                            if column_number == 3:  # Columna de "Peso Neto"
+                                data = "{:.3f}".format(data)
+                            if column_number == 4:  # Columna de "TALLO SOLO"
+                                data = "{:.3f}".format(data)
+                            if column_number == 5:  # Columna de "TALLO CORAL"
+                                data = "{:.3f}".format(data)
+                            if column_number == 6:  # Columna de "MEDIA VALVA TALLO SOLO"
+                                data = "{:.3f}".format(data)
+                            if column_number == 7:  # Columna de "MEDIA VALVA TALLO CORAL"
+                                data = "{:.3f}".format(data)
+                            if column_number == 8:  # Columna de "OTROS"
+                                data = "{:.3f}".format(data)
+                            if column_number == 9 :  # Columna de "Hora Peso"
+                                hours, remainder = divmod(data.seconds, 3600)
+                                minutes, seconds = divmod(remainder, 60)
+                                data = "{:02}:{:02}:{:02}".format(hours, minutes, seconds)
+
+                            item = QTableWidgetItem(str(data))
+                            item.setTextAlignment(Qt.AlignCenter)
+                            self.tablaDePesos.setItem(row_number, column_number, item)
+        
+    def fn_finalizarLote(self):
+        horaFinLote = datetime.now().strftime('%H:%M:%S')
+        self.conexion.db_finalizarLote(numeroLote, numeroProceso, horaFinLote, acumuladoLote)
+        self.fn_verificarProceso()
+        self.fn_listarPesadas()
     
-if __name__ == '__main__':
-    app = QApplication(sys.argv)
-    gui = InicioSistema()
-    gui.show()
-    sys.exit(app.exec_())
+    def fn_finalizarProceso(self):
+        horaFinProceso = datetime.now().strftime('%H:%M:%S')
+        fechaFinProceso = datetime.now().strftime('%Y-%m-%d')
+        horaFinProceso = datetime.now().strftime('%H:%M:%S')
+        self.conexion.db_finalizarProceso(numeroProceso, fechaFinProceso, horaFinProceso, acumuladoProceso)
+        
+        horaFinLote = datetime.now().strftime('%H:%M:%S')
+        self.conexion.db_finalizarLote(numeroLote, numeroProceso, horaFinLote, acumuladoLote)
+        
+        self.fn_modal_principal()
     
 # DISEÑADO Y DESARROLLADO POR SANTOS VILCHEZ EDINSON PASCUAL
 # LA UNIÓN - PIURA - PERU ; 2024

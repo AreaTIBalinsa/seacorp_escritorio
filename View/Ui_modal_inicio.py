@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'd:\seacorp_escritorio(2)\View\modal_alerta.ui'
+# Form implementation generated from reading ui file 'c:\Users\edins\Documents\1 PROYECTOS VUE3 - LARAVEL - INERTIA\seacorp_escritorio\View\modal_inicio.ui'
 #
 # Created by: PyQt5 UI code generator 5.15.10
 #
@@ -11,20 +11,14 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 
 
-class Ui_modalAlerta(object):
-    def setupUi(self, modalAlerta):
-        modalAlerta.setObjectName("modalAlerta")
-        modalAlerta.setWindowModality(QtCore.Qt.NonModal)
-        modalAlerta.resize(1600, 900)
-        modalAlerta.setStyleSheet("background-color: rgb(255, 255, 255);")
-        self.labelFondoSistema = QtWidgets.QLabel(modalAlerta)
-        self.labelFondoSistema.setGeometry(QtCore.QRect(0, 0, 1600, 900))
-        self.labelFondoSistema.setFocusPolicy(QtCore.Qt.NoFocus)
-        self.labelFondoSistema.setText("")
-        self.labelFondoSistema.setScaledContents(True)
-        self.labelFondoSistema.setObjectName("labelFondoSistema")
-        self.frame = QtWidgets.QFrame(modalAlerta)
-        self.frame.setGeometry(QtCore.QRect(214, 154, 1171, 591))
+class Ui_Modal_Inicio(object):
+    def setupUi(self, Modal_Inicio):
+        Modal_Inicio.setObjectName("Modal_Inicio")
+        Modal_Inicio.resize(1600, 900)
+        self.centralwidget = QtWidgets.QWidget(Modal_Inicio)
+        self.centralwidget.setObjectName("centralwidget")
+        self.frame = QtWidgets.QFrame(self.centralwidget)
+        self.frame.setGeometry(QtCore.QRect(215, 155, 1170, 590))
         self.frame.setStyleSheet("#frame{\n"
 "    background-color: rgba(255, 255, 255, 140);\n"
 "    border-radius: 30px;\n"
@@ -583,7 +577,13 @@ class Ui_modalAlerta(object):
         self.lblPresionarOtros.raise_()
         self.lblOtros.raise_()
         self.lblImgOtros.raise_()
-        self.frameFondoSistema = QtWidgets.QFrame(modalAlerta)
+        self.labelFondoSistema = QtWidgets.QLabel(self.centralwidget)
+        self.labelFondoSistema.setGeometry(QtCore.QRect(0, 0, 1600, 900))
+        self.labelFondoSistema.setFocusPolicy(QtCore.Qt.NoFocus)
+        self.labelFondoSistema.setText("")
+        self.labelFondoSistema.setScaledContents(True)
+        self.labelFondoSistema.setObjectName("labelFondoSistema")
+        self.frameFondoSistema = QtWidgets.QFrame(self.centralwidget)
         self.frameFondoSistema.setGeometry(QtCore.QRect(0, 0, 1600, 900))
         self.frameFondoSistema.setStyleSheet("background-color: rgba(43, 43, 43, 200);\n"
 "")
@@ -593,26 +593,27 @@ class Ui_modalAlerta(object):
         self.labelFondoSistema.raise_()
         self.frameFondoSistema.raise_()
         self.frame.raise_()
+        Modal_Inicio.setCentralWidget(self.centralwidget)
 
-        self.retranslateUi(modalAlerta)
-        QtCore.QMetaObject.connectSlotsByName(modalAlerta)
+        self.retranslateUi(Modal_Inicio)
+        QtCore.QMetaObject.connectSlotsByName(Modal_Inicio)
 
-    def retranslateUi(self, modalAlerta):
+    def retranslateUi(self, Modal_Inicio):
         _translate = QtCore.QCoreApplication.translate
-        modalAlerta.setWindowTitle(_translate("modalAlerta", "Alerta"))
-        self.lblPresionarReestablecer.setText(_translate("modalAlerta", "PRESIONE (6)"))
-        self.lblReestablecer.setText(_translate("modalAlerta", "REESTABLECER"))
-        self.lblPresionarIniciarProceso.setText(_translate("modalAlerta", "PRESIONE (7)"))
-        self.lblIniciarProceso.setText(_translate("modalAlerta", "INICIAR PROCESO"))
-        self.lblPresionarApagar.setText(_translate("modalAlerta", "PRESIONE (0)"))
-        self.lblApagar.setText(_translate("modalAlerta", "APAGAR"))
-        self.lblPresionarTalloSolo.setText(_translate("modalAlerta", "PRESIONE (1)"))
-        self.lblTalloSolo.setText(_translate("modalAlerta", "TALLO SOLO"))
-        self.lblPresionarTalloCoral.setText(_translate("modalAlerta", "PRESIONE (2)"))
-        self.lblTalloCoral.setText(_translate("modalAlerta", "TALLO CORAL"))
-        self.lblPresionarMediaValvaTs.setText(_translate("modalAlerta", "PRESIONE (3)"))
-        self.lblMediaValvaTs.setText(_translate("modalAlerta", "MEDIA VALVA T/S"))
-        self.lblPresionarMediaValvaTc.setText(_translate("modalAlerta", "PRESIONE (4)"))
-        self.lblMediaValvaTc.setText(_translate("modalAlerta", "MEDIA VALVA T/C"))
-        self.lblPresionarOtros.setText(_translate("modalAlerta", "PRESIONE (5)"))
-        self.lblOtros.setText(_translate("modalAlerta", "OTROS"))
+        Modal_Inicio.setWindowTitle(_translate("Modal_Inicio", "MainWindow"))
+        self.lblPresionarReestablecer.setText(_translate("Modal_Inicio", "PRESIONE (-)"))
+        self.lblReestablecer.setText(_translate("Modal_Inicio", "REESTABLECER"))
+        self.lblPresionarIniciarProceso.setText(_translate("Modal_Inicio", "PRESIONE  (↵)"))
+        self.lblIniciarProceso.setText(_translate("Modal_Inicio", "INICIAR PROCESO"))
+        self.lblPresionarApagar.setText(_translate("Modal_Inicio", "PRESIONE (0)"))
+        self.lblApagar.setText(_translate("Modal_Inicio", "APAGAR"))
+        self.lblPresionarTalloSolo.setText(_translate("Modal_Inicio", "PRESIONE (1)"))
+        self.lblTalloSolo.setText(_translate("Modal_Inicio", "TALLO SOLO"))
+        self.lblPresionarTalloCoral.setText(_translate("Modal_Inicio", "PRESIONE (2)"))
+        self.lblTalloCoral.setText(_translate("Modal_Inicio", "TALLO CORAL"))
+        self.lblPresionarMediaValvaTs.setText(_translate("Modal_Inicio", "PRESIONE (3)"))
+        self.lblMediaValvaTs.setText(_translate("Modal_Inicio", "MEDIA VALVA T/S"))
+        self.lblPresionarMediaValvaTc.setText(_translate("Modal_Inicio", "PRESIONE (4)"))
+        self.lblMediaValvaTc.setText(_translate("Modal_Inicio", "MEDIA VALVA T/C"))
+        self.lblPresionarOtros.setText(_translate("Modal_Inicio", "PRESIONE (5)"))
+        self.lblOtros.setText(_translate("Modal_Inicio", "OTROS"))
