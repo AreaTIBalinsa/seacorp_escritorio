@@ -17,8 +17,6 @@ class ModalPrincipal(QMainWindow):
         self.setWindowIcon(QtGui.QIcon("Resources/icon.jpg"))
         self.setWindowTitle('SISTEMA INTEGRAL || BALINSA')
         
-        self.modulo_principal = InicioSistema
-        
         self.ui.labelFondoSistema.setPixmap(QPixmap("Resources/conchas.png"))
         self.ui.lblImgTalloSolo.setPixmap(QPixmap("Resources/tallo_solo.png"))
         self.ui.lblImgTalloCoral.setPixmap(QPixmap("Resources/tallo_coral.png"))
@@ -99,7 +97,6 @@ class ModalPrincipal(QMainWindow):
                     current_x += frame_width + spacing
                 else:
                     frame.setHidden(True)
-                    
             
             if not self.aplicacion_Principal.isVisible():
                 self.aplicacion_Principal.show()

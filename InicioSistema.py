@@ -59,13 +59,26 @@ pesoTaraMediaValvaTalloCoral = 0
 pesoTaraOtros = 0
 
 frmEditarTaraAlerta = False
-frmEditarPesadaAlerta = False
+frmEditarOEliminarPesadaAlerta = False
 frmDescuentoAlerta = False
 frmFinalizarAlerta = False
 
 frmIngresarNuevaTara = False
+frmSeleccionarEditarPesada = False
+frmIngresarPassword = False
+frmAlertaEliminar = False
+frmAlertaEditarCodigoUsuario = False
+frmEditarPresentacion = False
+
+frmIngresarPasswordAdministradorTara = False
+frmIngresarPasswordAdministradorEditarPesada = False
+frmIngresarPasswordAdministradorDescuento = False
 
 presentacionEditarTara = 0
+idPesadaEditarOEliminar = 0
+codigoColaboradorNuevo = 0
+
+passwordEliminar = ""
 
 # Variables de rutas de imagenes para alerta
 correcto = "Resources/correcto.png"
@@ -261,75 +274,98 @@ class WorkerThreadFechaHora(QThread):
 # ===============================
 
 class AplicacionPrincipal(QMainWindow):
-    def __init__(self):
-        super().__init__()
-        self.ui = Ui_MainWindow()
-        self.conexion = DataBase.database_conexion.Conectar()
-        self.modal_Inicio = ModalInicio.ModalPrincipal()
-        
-        # self.pulsosArduino = pulsosArduino
-        
-        # self.cap = cv2.VideoCapture(0)
-        # self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, 270)
-        # self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 200)
+    _instance = None
+    primeraVez = True
 
-        # self.timer = QTimer()
-        # self.timer.timeout.connect(self.update_frame)
-        # self.timer.start(30)
-        
-        self.ui.setupUi(self)
-        self.setWindowFlag(QtCore.Qt.FramelessWindowHint)
-        self.setWindowIcon(QtGui.QIcon("Resources/icon.jpg"))
-        self.setWindowTitle('SISTEMA INTEGRAL || BALINSA')
-        
-        self.ui.imgPlataformaBalanza.setPixmap(QPixmap("Resources/plataforma_balanza.png"))
-        self.ui.imgPanera.setPixmap(QPixmap("Resources/panera.png"))
-        self.ui.imgFlechaDerecha.setPixmap(QPixmap("Resources/flecha.png"))
-        self.ui.imgFlechaIzquierda.setPixmap(QPixmap("Resources/flecha.png"))
-        self.ui.imgFinalizar.setPixmap(QPixmap("Resources/error.png"))
-        
-        self.workerFechaHora = WorkerThreadFechaHora()
-        self.workerFechaHora.start() # Iniciamos el hilo
-        self.workerFechaHora.update_fecha.connect(self.mostrar_fecha)
-        self.workerFechaHora.update_hora.connect(self.mostrar_hora)
-        
-        self.worker = WorkerThread() # Hilo de Balanza
-        self.worker.start()
-        self.worker.update_peso.connect(self.fn_actualizar_peso)
-        self.worker.update_estado.connect(self.fn_actualizar_estado)
-        
-        # self.workerBase = WorkerThreadSubirDatosBase()
-        # self.workerBase.start()
-        
-        self.fn_asignaPesosMaximosYTaras()
-        
-        self.ui.txtCodigoColaborador.textChanged.connect(self.fn_recepcionaCodigoColaborador)
-        
-        self.ui.imgPanera.setHidden(True)
-        self.ui.txtCodigoColaborador.setEnabled(False)
-        self.ui.txtCodigoColaborador.setFocus(False)
-        self.ui.txtCodigoColaborador.setText("")
-        self.ui.lblPesoIndicador.setText("-----")
-        self.ui.lblIndicadorPlataforma.setText("-----")
-        
-        self.ui.frmEditarTaraAlerta.setHidden(True)
-        self.ui.frmFinalizarAlerta.setHidden(True)
-        self.ui.frmIngresarNuevaTara.setHidden(True)
-        self.ui.frmSombra.setHidden(True)
-        self.ui.frmAlerta.setHidden(True)
-        
-        self.tablaDePesos = self.ui.tblDetallePesadas
-        self.tablaDePesos.setColumnWidth(0, 100)
-        self.tablaDePesos.setColumnWidth(1, 250)
-        self.tablaDePesos.setColumnWidth(2, 180)
-        self.tablaDePesos.setColumnWidth(3, 100)
-        self.tablaDePesos.setColumnWidth(4, 100)
-        self.tablaDePesos.setColumnWidth(5, 100)
-        self.tablaDePesos.setColumnWidth(6, 100)
-        self.tablaDePesos.setColumnWidth(7, 100)
-        self.tablaDePesos.setColumnWidth(8, 100)
-        self.tablaDePesos.setColumnWidth(9, 80)
-        self.tablaDePesos.setColumnHidden(10, True)
+    def __new__(cls, *args, **kwargs):
+        if not cls._instance:
+            cls._instance = super(AplicacionPrincipal, cls).__new__(cls)
+        return cls._instance
+
+    def __init__(self):
+        if self.primeraVez:
+            super().__init__()
+
+        if not hasattr(self, 'ui'):
+            self.ui = Ui_MainWindow()
+            self.conexion = DataBase.database_conexion.Conectar()
+            self.modal_Inicio = ModalInicio.ModalPrincipal()
+            self.ui.setupUi(self)
+
+            self.initialized = True
+            self.primeraVez = False
+
+            self.pulsosArduino = pulsosArduino
+            
+            # self.cap = cv2.VideoCapture(0)
+            # self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, 270)
+            # self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 200)
+
+            # self.timer = QTimer()
+            # self.timer.timeout.connect(self.update_frame)
+            # self.timer.start(30)
+            
+            self.setWindowFlag(QtCore.Qt.FramelessWindowHint)
+            self.setWindowIcon(QtGui.QIcon("Resources/icon.jpg"))
+            self.setWindowTitle('SISTEMA INTEGRAL || BALINSA')
+            
+            self.ui.imgPlataformaBalanza.setPixmap(QPixmap("Resources/plataforma_balanza.png"))
+            self.ui.imgPanera.setPixmap(QPixmap("Resources/panera.png"))
+            self.ui.imgFlechaDerecha.setPixmap(QPixmap("Resources/flecha.png"))
+            self.ui.imgFlechaIzquierda.setPixmap(QPixmap("Resources/flecha.png"))
+            self.ui.imgFinalizar.setPixmap(QPixmap("Resources/error.png"))
+            
+            self.workerFechaHora = WorkerThreadFechaHora()
+            self.workerFechaHora.start() # Iniciamos el hilo
+            self.workerFechaHora.update_fecha.connect(self.mostrar_fecha)
+            self.workerFechaHora.update_hora.connect(self.mostrar_hora)
+            
+            self.worker = WorkerThread() # Hilo de Balanza
+            self.worker.start()
+            self.worker.update_peso.connect(self.fn_actualizar_peso)
+            self.worker.update_estado.connect(self.fn_actualizar_estado)
+            
+            # self.workerBase = WorkerThreadSubirDatosBase()
+            # self.workerBase.start()
+            
+            self.fn_asignaPesosMaximosYTaras()
+            
+            self.ui.txtCodigoColaborador.textChanged.connect(self.fn_recepcionaCodigoColaborador)
+            self.ui.txtIngresarNuevoCodigoColaborador.textChanged.connect(self.fn_recepcionaCodigoColaboradorNuevo)
+            self.ui.txtIngresarNuevaTara.textChanged.connect(self.fn_validarEntradaNumerica)
+            
+            self.ui.imgPanera.setHidden(True)
+            self.ui.txtCodigoColaborador.setEnabled(False)
+            self.ui.txtCodigoColaborador.setFocus(False)
+            self.ui.txtCodigoColaborador.setText("")
+            self.ui.lblPesoIndicador.setText("-----")
+            self.ui.lblIndicadorPlataforma.setText("-----")
+            
+            self.ui.frmEditarTaraAlerta.setHidden(True)
+            self.ui.frmFinalizarAlerta.setHidden(True)
+            self.ui.frmIngresarNuevaTara.setHidden(True)
+            self.ui.frmEditarOEliminarPesadaAlerta.setHidden(True)
+            self.ui.frmSeleccionarEditarPesada.setHidden(True)
+            self.ui.frmIngresarPassword.setHidden(True)
+            self.ui.frmAlertaEliminar.setHidden(True)
+            self.ui.frmIngresarPasswordAdministrador.setHidden(True)
+            self.ui.frmAlertaEditarCodigoUsuario.setHidden(True)
+            self.ui.frmEditarPresentacion.setHidden(True)
+            self.ui.frmSombra.setHidden(True)
+            self.ui.frmAlerta.setHidden(True)
+            
+            self.tablaDePesos = self.ui.tblDetallePesadas
+            self.tablaDePesos.setColumnWidth(0, 100)
+            self.tablaDePesos.setColumnWidth(1, 250)
+            self.tablaDePesos.setColumnWidth(2, 180)
+            self.tablaDePesos.setColumnWidth(3, 100)
+            self.tablaDePesos.setColumnWidth(4, 100)
+            self.tablaDePesos.setColumnWidth(5, 100)
+            self.tablaDePesos.setColumnWidth(6, 100)
+            self.tablaDePesos.setColumnWidth(7, 100)
+            self.tablaDePesos.setColumnWidth(8, 100)
+            self.tablaDePesos.setColumnWidth(9, 80)
+            self.tablaDePesos.setColumnHidden(10, True)
         
     def update_frame(self):
         ret, frame = self.cap.read()
@@ -421,6 +457,14 @@ class AplicacionPrincipal(QMainWindow):
         else:
             self.modal_Inicio.showNormal()
             self.modal_Inicio.activateWindow()
+            
+        self.modal_Inicio.ui.lblTalloSolo.setStyleSheet("background-color: rgb(255, 207, 11);""border-radius: 10px;""border: none;""color: rgb(255, 255, 255);""padding-left: 40;")
+        self.modal_Inicio.ui.lblTalloCoral.setStyleSheet("background-color: rgb(255, 207, 11);""border-radius: 10px;""border: none;""color: rgb(255, 255, 255);""padding-left: 55;")
+        self.modal_Inicio.ui.lblMediaValvaTs.setStyleSheet("background-color: rgb(255, 207, 11);""border-radius: 10px;""border: none;""color: rgb(255, 255, 255);""padding-left: 50;")
+        self.modal_Inicio.ui.lblMediaValvaTc.setStyleSheet("background-color: rgb(255, 207, 11);""border-radius: 10px;""border: none;""color: rgb(255, 255, 255);""padding-left: 50;")
+        self.modal_Inicio.ui.lblOtros.setStyleSheet("background-color: rgb(255, 207, 11);""border-radius: 10px;""border: none;""color: rgb(255, 255, 255);""padding-left: 30;")
+        
+        self.close()
         
     def fn_actualizar_peso(self, val):
         global captaCodigo
@@ -524,10 +568,18 @@ class AplicacionPrincipal(QMainWindow):
     def condiciones_base(self):
         return (
             not frmEditarTaraAlerta and
-            not frmEditarPesadaAlerta and
+            not frmEditarOEliminarPesadaAlerta and
             not frmDescuentoAlerta and
             not frmFinalizarAlerta and
-            not frmIngresarNuevaTara
+            not frmIngresarNuevaTara and
+            not frmSeleccionarEditarPesada and
+            not frmIngresarPassword and
+            not frmIngresarPasswordAdministradorTara and
+            not frmIngresarPasswordAdministradorEditarPesada and
+            not frmIngresarPasswordAdministradorDescuento and
+            not frmAlertaEditarCodigoUsuario and
+            not frmEditarPresentacion and
+            not frmAlertaEliminar
         )
         
     def condiciones_alertas(self):
@@ -535,6 +587,13 @@ class AplicacionPrincipal(QMainWindow):
             not self.ui.frmEditarTaraAlerta.isVisible() and
             not self.ui.frmFinalizarAlerta.isVisible() and
             not self.ui.frmIngresarNuevaTara.isVisible() and
+            not self.ui.frmSeleccionarEditarPesada.isVisible() and
+            not self.ui.frmEditarOEliminarPesadaAlerta.isVisible() and
+            not self.ui.frmIngresarPassword.isVisible() and
+            not self.ui.frmIngresarPasswordAdministrador.isVisible() and
+            not self.ui.frmAlertaEliminar.isVisible() and
+            not self.ui.frmAlertaEditarCodigoUsuario.isVisible() and
+            not self.ui.frmEditarPresentacion.isVisible() and
             not self.ui.frmSombra.isVisible() and
             not self.ui.frmAlerta.isVisible()
         )
@@ -543,21 +602,253 @@ class AplicacionPrincipal(QMainWindow):
         return (
             not self.ui.frmEditarTaraAlerta.isVisible() and
             not self.ui.frmFinalizarAlerta.isVisible() and
-            not self.ui.frmIngresarNuevaTara.isVisible()
+            not self.ui.frmIngresarNuevaTara.isVisible() and
+            not self.ui.frmSeleccionarEditarPesada.isVisible() and
+            not self.ui.frmEditarOEliminarPesadaAlerta.isVisible() and
+            not self.ui.frmIngresarPassword.isVisible() and
+            not self.ui.frmIngresarPasswordAdministrador.isVisible() and
+            not self.ui.frmAlertaEditarCodigoUsuario.isVisible() and
+            not self.ui.frmEditarPresentacion.isVisible() and
+            not self.ui.frmAlertaEliminar.isVisible()
         )
          
     def keyReleaseEvent(self, event):
         
         global frmEditarTaraAlerta
-        global frmEditarPesadaAlerta
+        global frmEditarOEliminarPesadaAlerta
         global frmDescuentoAlerta
         global frmFinalizarAlerta
         
         global frmIngresarNuevaTara
+        global frmSeleccionarEditarPesada
+        global frmIngresarPassword
+        global frmAlertaEliminar
+        global frmAlertaEditarCodigoUsuario
+        global frmEditarPresentacion
+        
+        global frmIngresarPasswordAdministradorTara
+        global frmIngresarPasswordAdministradorEditarPesada
+        global frmIngresarPasswordAdministradorDescuento
         
         global presentacionEditarTara
+        global idPesadaEditarOEliminar
+        global codigoColaboradorNuevo
         
-        if not self.ui.txtCodigoColaborador.hasFocus():
+        if (event.key() == Qt.Key_1) and self.ui.frmFinalizarAlerta.isVisible() and frmFinalizarAlerta:
+            if acumuladoLote != 0:
+                self.fn_finalizarLote()
+                self.ui.frmSombra.setHidden(True)
+                self.ui.frmFinalizarAlerta.setHidden(True)
+                frmFinalizarAlerta = False
+                self.fn_alerta("¡LOTE FINALIZADO!",correcto,"Se ha finalizado el lote correctamente.",2000)
+            else:
+                self.fn_alerta("¡ERROR AL FINALIZAR LOTE!",error,"No se ha acumulado ningún peso en el lote.",2000)
+        
+        if (event.key() == Qt.Key_2) and self.ui.frmFinalizarAlerta.isVisible() and frmFinalizarAlerta:
+            self.fn_finalizarProceso()
+            self.ui.frmSombra.setHidden(True)
+            self.ui.frmFinalizarAlerta.setHidden(True)
+            frmFinalizarAlerta = False
+            
+        if (event.key() == Qt.Key_3) and self.ui.frmFinalizarAlerta.isVisible() and frmFinalizarAlerta:
+            self.ui.frmSombra.setHidden(True)
+            self.ui.frmFinalizarAlerta.setHidden(True)
+            frmFinalizarAlerta = False
+            
+        if (event.key() == Qt.Key_1) and self.ui.frmEditarTaraAlerta.isVisible() and frmEditarTaraAlerta:
+            presentacionEditarTara = 1
+            frmEditarTaraAlerta = False
+            self.ui.frmEditarTaraAlerta.setHidden(True)
+            frmIngresarNuevaTara = True
+            self.ui.frmIngresarNuevaTara.setHidden(False)
+            self.ui.txtIngresarNuevaTara.setFocus(True)
+        
+        if (event.key() == Qt.Key_2) and self.ui.frmEditarTaraAlerta.isVisible() and frmEditarTaraAlerta:
+            presentacionEditarTara = 2
+            frmEditarTaraAlerta = False
+            self.ui.frmEditarTaraAlerta.setHidden(True)
+            frmIngresarNuevaTara = True
+            self.ui.frmIngresarNuevaTara.setHidden(False)
+            self.ui.txtIngresarNuevaTara.setFocus(True)
+        
+        if (event.key() == Qt.Key_3) and self.ui.frmEditarTaraAlerta.isVisible() and frmEditarTaraAlerta:
+            presentacionEditarTara = 3
+            frmEditarTaraAlerta = False
+            self.ui.frmEditarTaraAlerta.setHidden(True)
+            frmIngresarNuevaTara = True
+            self.ui.frmIngresarNuevaTara.setHidden(False)
+            self.ui.txtIngresarNuevaTara.setFocus(True)
+        
+        if (event.key() == Qt.Key_4) and self.ui.frmEditarTaraAlerta.isVisible() and frmEditarTaraAlerta:
+            presentacionEditarTara = 4
+            frmEditarTaraAlerta = False
+            self.ui.frmEditarTaraAlerta.setHidden(True)
+            frmIngresarNuevaTara = True
+            self.ui.frmIngresarNuevaTara.setHidden(False)
+            self.ui.txtIngresarNuevaTara.setFocus(True)
+        
+        if (event.key() == Qt.Key_5) and self.ui.frmEditarTaraAlerta.isVisible() and frmEditarTaraAlerta:
+            presentacionEditarTara = 5
+            frmEditarTaraAlerta = False
+            self.ui.frmEditarTaraAlerta.setHidden(True)
+            frmIngresarNuevaTara = True
+            self.ui.frmIngresarNuevaTara.setHidden(False)
+            self.ui.txtIngresarNuevaTara.setFocus(True)
+            
+        if (event.key() == Qt.Key_1) and self.ui.frmEditarPresentacion.isVisible() and frmEditarPresentacion:
+            codigoNuevaEspecie = "TALLO SOLO"
+            self.conexion.db_actualizarEspeciePesada(idPesadaEditarOEliminar, codigoNuevaEspecie)
+            self.ui.frmSombra.setHidden(True)
+            self.ui.frmEditarPresentacion.setHidden(True)
+            frmEditarPresentacion = False
+            self.fn_listarPesadas()
+            self.fn_alerta("ACTUALIZACIÓN CORRECTA!",correcto,"El registro se ha actualizado correctamente.")
+        
+        if (event.key() == Qt.Key_2) and self.ui.frmEditarPresentacion.isVisible() and frmEditarPresentacion:
+            codigoNuevaEspecie = "TALLO CORAL"
+            self.conexion.db_actualizarEspeciePesada(idPesadaEditarOEliminar, codigoNuevaEspecie)
+            self.ui.frmSombra.setHidden(True)
+            self.ui.frmEditarPresentacion.setHidden(True)
+            frmEditarPresentacion = False
+            self.fn_listarPesadas()
+            self.fn_alerta("ACTUALIZACIÓN CORRECTA!",correcto,"El registro se ha actualizado correctamente.")
+        
+        if (event.key() == Qt.Key_3) and self.ui.frmEditarPresentacion.isVisible() and frmEditarPresentacion:
+            codigoNuevaEspecie = "MEDIA VALVA T/S"
+            self.conexion.db_actualizarEspeciePesada(idPesadaEditarOEliminar, codigoNuevaEspecie)
+            self.ui.frmSombra.setHidden(True)
+            self.ui.frmEditarPresentacion.setHidden(True)
+            frmEditarPresentacion = False
+            self.fn_listarPesadas()
+            self.fn_alerta("ACTUALIZACIÓN CORRECTA!",correcto,"El registro se ha actualizado correctamente.")
+        
+        if (event.key() == Qt.Key_4) and self.ui.frmEditarPresentacion.isVisible() and frmEditarPresentacion:
+            codigoNuevaEspecie = "MEDIA VALVA T/C"
+            self.conexion.db_actualizarEspeciePesada(idPesadaEditarOEliminar, codigoNuevaEspecie)
+            self.ui.frmSombra.setHidden(True)
+            self.ui.frmEditarPresentacion.setHidden(True)
+            frmEditarPresentacion = False
+            self.fn_listarPesadas()
+            self.fn_alerta("ACTUALIZACIÓN CORRECTA!",correcto,"El registro se ha actualizado correctamente.")
+        
+        if (event.key() == Qt.Key_5) and self.ui.frmEditarPresentacion.isVisible() and frmEditarPresentacion:
+            codigoNuevaEspecie = "OTROS"
+            self.conexion.db_actualizarEspeciePesada(idPesadaEditarOEliminar, codigoNuevaEspecie)
+            self.ui.frmSombra.setHidden(True)
+            self.ui.frmEditarPresentacion.setHidden(True)
+            frmEditarPresentacion = False
+            self.fn_listarPesadas()
+            self.fn_alerta("ACTUALIZACIÓN CORRECTA!",correcto,"El registro se ha actualizado correctamente.")
+            
+        if (event.key() == Qt.Key_Enter or event.key() == Qt.Key_Return) and self.ui.frmIngresarNuevaTara.isVisible() and frmIngresarNuevaTara:
+            nuevoValorTara = self.ui.txtIngresarNuevaTara.text()
+            if nuevoValorTara != "" and nuevoValorTara != 0:
+                nuevoValorTara = int(nuevoValorTara)/1000
+                self.conexion.db_actualizaTaraPresentacion(presentacionEditarTara, nuevoValorTara)
+                self.fn_asignaPesosMaximosYTaras()
+                self.ui.frmSombra.setHidden(True)
+                self.ui.frmIngresarNuevaTara.setHidden(True)
+                frmIngresarNuevaTara = False
+                self.fn_alerta("ACTUALIZACIÓN CORRECTA!",correcto,"El registro se ha actualizado correctamente.")
+            else:
+                self.fn_alerta("¡ERROR AL ACTUALIZAR!",error,"Debe ingresar un valor numérico para la tara.",1000)
+                
+        if (event.key() == Qt.Key_Enter or event.key() == Qt.Key_Return) and self.ui.frmIngresarPassword.isVisible() and frmIngresarPassword:
+            passwordExtraido = self.ui.txtPasswordEliminar.text()
+            if str(passwordEliminar) == str(passwordExtraido):
+                self.conexion.db_eliminarRegistro(idPesadaEditarOEliminar)
+                frmIngresarPassword = False
+                self.ui.frmSombra.setHidden(True)
+                self.ui.frmIngresarPassword.setHidden(True)
+                self.fn_listarPesadas()
+            else:
+                self.fn_alerta("¡CONTRASEÑA INCORRECTA!",error,"La contraseña no coincide con la contraseña declara para eliminar.")
+                
+        if (event.key() == Qt.Key_Enter or event.key() == Qt.Key_Return) and self.ui.frmAlertaEliminar.isVisible() and frmAlertaEliminar:
+            frmAlertaEliminar = False
+            self.ui.frmAlertaEliminar.setHidden(True)
+            frmIngresarPassword = True
+            self.ui.frmIngresarPassword.setHidden(False)
+            self.ui.txtPasswordEliminar.setFocus(False)
+            self.ui.txtPasswordEliminar.setText("")
+        
+        if (event.key() == Qt.Key_Enter or event.key() == Qt.Key_Return) and self.ui.frmAlertaEditarCodigoUsuario.isVisible() and frmAlertaEditarCodigoUsuario:
+            if codigoColaboradorNuevo != 0:
+                self.conexion.db_actualizarCodigoColaboradorPesada(idPesadaEditarOEliminar, codigoColaboradorNuevo)
+                frmAlertaEditarCodigoUsuario = False
+                self.ui.frmSombra.setHidden(True)
+                self.ui.frmAlertaEditarCodigoUsuario.setHidden(True)
+                self.fn_alerta("ACTUALIZACIÓN CORRECTA!",correcto,"El registro se ha actualizado correctamente.")
+                self.fn_listarPesadas()
+            else:
+                self.fn_alerta("¡ERROR AL REGISTRAR!",error,"Debe seleccionar un colaborador.",1000)
+                
+        if (event.key() == Qt.Key_1) and self.ui.frmEditarOEliminarPesadaAlerta.isVisible() and frmEditarOEliminarPesadaAlerta:
+            frmEditarOEliminarPesadaAlerta = False
+            self.ui.frmEditarOEliminarPesadaAlerta.setHidden(True)
+            frmAlertaEditarCodigoUsuario = True
+            self.ui.frmAlertaEditarCodigoUsuario.setHidden(False)
+            self.ui.txtIngresarNuevoCodigoColaborador.setFocus(False)
+            self.ui.txtIngresarNuevoCodigoColaborador.setText("")
+            codigoColaboradorNuevo = 0
+        
+        if (event.key() == Qt.Key_2) and self.ui.frmEditarOEliminarPesadaAlerta.isVisible() and frmEditarOEliminarPesadaAlerta:
+            frmEditarOEliminarPesadaAlerta = False
+            self.ui.frmEditarOEliminarPesadaAlerta.setHidden(True)
+            frmEditarPresentacion = True
+            self.ui.frmEditarPresentacion.setHidden(False)
+        
+        if (event.key() == Qt.Key_3) and self.ui.frmEditarOEliminarPesadaAlerta.isVisible() and frmEditarOEliminarPesadaAlerta:
+            frmEditarOEliminarPesadaAlerta = False
+            self.ui.frmEditarOEliminarPesadaAlerta.setHidden(True)
+            frmAlertaEliminar = True
+            self.ui.frmAlertaEliminar.setHidden(False)
+                
+        if (event.key() == Qt.Key_Enter or event.key() == Qt.Key_Return) and self.ui.frmSeleccionarEditarPesada.isVisible() and frmSeleccionarEditarPesada:
+            numeroDePesada = int(self.ui.txtNumeroDePesada.text())
+            tablaDePesos = self.ui.tblDetallePesadas
+            totalFilas = tablaDePesos.rowCount()
+
+            if numeroDePesada <= totalFilas:
+                txtNumeroDePesada = totalFilas - numeroDePesada
+                idPesadaEditarOEliminar = tablaDePesos.item(txtNumeroDePesada, 10).text()
+                
+                frmSeleccionarEditarPesada = False
+                self.ui.frmSeleccionarEditarPesada.setHidden(True)
+                frmEditarOEliminarPesadaAlerta = True
+                self.ui.frmEditarOEliminarPesadaAlerta.setHidden(False)
+            else:
+                self.fn_alerta("¡ADVERTENCIA!",error,"El registro no existe, intente de nuevo.",1000)
+                
+        if (event.key() == Qt.Key_Enter or event.key() == Qt.Key_Return) and self.ui.frmIngresarPasswordAdministrador.isVisible() and frmIngresarPasswordAdministradorTara:
+            passwordExtraido = self.ui.txtPasswordAdministrador.text()
+            if str(passwordEliminar) == str(passwordExtraido):
+                frmIngresarPasswordAdministradorTara = False
+                self.ui.frmIngresarPasswordAdministrador.setHidden(True)
+                self.ui.frmSombra.setHidden(False)
+                self.ui.frmEditarTaraAlerta.setHidden(False)
+                frmEditarTaraAlerta = True
+                presentacionEditarTara = 0
+                self.ui.txtIngresarNuevaTara.setText("")
+            else:
+                self.fn_alerta("¡CONTRASEÑA INCORRECTA!",error,"La contraseña es incorrecta.")
+                
+        if (event.key() == Qt.Key_Enter or event.key() == Qt.Key_Return) and self.ui.frmIngresarPasswordAdministrador.isVisible() and frmIngresarPasswordAdministradorEditarPesada:
+            passwordExtraido = self.ui.txtPasswordAdministrador.text()
+            if str(passwordEliminar) == str(passwordExtraido):
+                frmIngresarPasswordAdministradorEditarPesada = False
+                self.ui.frmIngresarPasswordAdministrador.setHidden(True)
+                self.ui.frmSombra.setHidden(False)
+                self.ui.frmSeleccionarEditarPesada.setHidden(False)
+                frmSeleccionarEditarPesada = True
+                idPesadaEditarOEliminar = 0
+                self.ui.txtNumeroDePesada.setText("")
+                self.ui.txtNumeroDePesada.setFocus(True)
+            else:
+                self.fn_alerta("¡CONTRASEÑA INCORRECTA!",error,"La contraseña es incorrecta.")
+        
+        if not self.ui.txtCodigoColaborador.hasFocus() and self.condiciones_base() and self.condiciones_alertas():
+            self.tablaDePesos.setCurrentCell(0, 1)
             self.setFocus()
             
             if (event.key() == Qt.Key_1) and self.condiciones_base() and self.condiciones_alertas() and seleccionarTalloSolo:
@@ -574,68 +865,7 @@ class AplicacionPrincipal(QMainWindow):
             
             if (event.key() == Qt.Key_5) and self.condiciones_base() and self.condiciones_alertas() and seleccionarOtros:
                 self.fn_seleccionarEspecie(5)
-                
-            if (event.key() == Qt.Key_1) and self.ui.frmFinalizarAlerta.isVisible() and frmFinalizarAlerta:
-                if acumuladoLote != 0:
-                    self.fn_finalizarLote()
-                    self.ui.frmSombra.setHidden(True)
-                    self.ui.frmFinalizarAlerta.setHidden(True)
-                    frmFinalizarAlerta = False
-                    self.fn_alerta("¡LOTE FINALIZADO!",correcto,"Se ha finalizado el lote correctamente.",2000)
-                else:
-                    self.fn_alerta("¡ERROR AL FINALIZAR LOTE!",error,"No se ha acumulado ningún peso en el lote.",2000)
             
-            if (event.key() == Qt.Key_2) and self.ui.frmFinalizarAlerta.isVisible() and frmFinalizarAlerta:
-                self.fn_finalizarProceso()
-                self.ui.frmSombra.setHidden(True)
-                self.ui.frmFinalizarAlerta.setHidden(True)
-                frmFinalizarAlerta = False
-                
-            if (event.key() == Qt.Key_3) and self.ui.frmFinalizarAlerta.isVisible() and frmFinalizarAlerta:
-                self.ui.frmSombra.setHidden(True)
-                self.ui.frmFinalizarAlerta.setHidden(True)
-                frmFinalizarAlerta = False
-                
-            if (event.key() == Qt.Key_1) and self.ui.frmEditarTaraAlerta.isVisible() and frmEditarTaraAlerta:
-                presentacionEditarTara = 1
-                frmEditarTaraAlerta = False
-                self.ui.frmEditarTaraAlerta.setHidden(True)
-                frmIngresarNuevaTara = True
-                self.ui.frmIngresarNuevaTara.setHidden(False)
-                self.ui.txtIngresarNuevaTara.setFocus(True)
-            
-            if (event.key() == Qt.Key_2) and self.ui.frmEditarTaraAlerta.isVisible() and frmEditarTaraAlerta:
-                presentacionEditarTara = 2
-                frmEditarTaraAlerta = False
-                self.ui.frmEditarTaraAlerta.setHidden(True)
-                frmIngresarNuevaTara = True
-                self.ui.frmIngresarNuevaTara.setHidden(False)
-                self.ui.txtIngresarNuevaTara.setFocus(True)
-            
-            if (event.key() == Qt.Key_3) and self.ui.frmEditarTaraAlerta.isVisible() and frmEditarTaraAlerta:
-                presentacionEditarTara = 3
-                frmEditarTaraAlerta = False
-                self.ui.frmEditarTaraAlerta.setHidden(True)
-                frmIngresarNuevaTara = True
-                self.ui.frmIngresarNuevaTara.setHidden(False)
-                self.ui.txtIngresarNuevaTara.setFocus(True)
-            
-            if (event.key() == Qt.Key_4) and self.ui.frmEditarTaraAlerta.isVisible() and frmEditarTaraAlerta:
-                presentacionEditarTara = 4
-                frmEditarTaraAlerta = False
-                self.ui.frmEditarTaraAlerta.setHidden(True)
-                frmIngresarNuevaTara = True
-                self.ui.frmIngresarNuevaTara.setHidden(False)
-                self.ui.txtIngresarNuevaTara.setFocus(True)
-            
-            if (event.key() == Qt.Key_5) and self.ui.frmEditarTaraAlerta.isVisible() and frmEditarTaraAlerta:
-                presentacionEditarTara = 5
-                frmEditarTaraAlerta = False
-                self.ui.frmEditarTaraAlerta.setHidden(True)
-                frmIngresarNuevaTara = True
-                self.ui.frmIngresarNuevaTara.setHidden(False)
-                self.ui.txtIngresarNuevaTara.setFocus(True)
-                
             # ===== Eventos para Abrir los Frame Principales =====
                 
             if (event.key() == Qt.Key_9) and self.condiciones_base() and self.condiciones_alertas():
@@ -644,12 +874,19 @@ class AplicacionPrincipal(QMainWindow):
                 frmFinalizarAlerta = True
             
             if (event.key() == Qt.Key_6) and self.condiciones_base() and self.condiciones_alertas():
+                frmIngresarPasswordAdministradorTara = True
                 self.ui.frmSombra.setHidden(False)
-                self.ui.frmEditarTaraAlerta.setHidden(False)
-                frmEditarTaraAlerta = True
-                presentacionEditarTara = 0
-                self.ui.txtIngresarNuevaTara.setText("")
+                self.ui.frmIngresarPasswordAdministrador.setHidden(False)
+                self.ui.txtPasswordAdministrador.setText("")
+                self.ui.txtPasswordAdministrador.setFocus(True)
                 
+            if (event.key() == Qt.Key_7) and self.condiciones_base() and self.condiciones_alertas():
+                frmIngresarPasswordAdministradorEditarPesada = True
+                self.ui.frmSombra.setHidden(False)
+                self.ui.frmIngresarPasswordAdministrador.setHidden(False)
+                self.ui.txtPasswordAdministrador.setText("")
+                self.ui.txtPasswordAdministrador.setFocus(True)
+            
             # ====================================================
                 
         if self.ui.txtCodigoColaborador.hasFocus():
@@ -670,6 +907,8 @@ class AplicacionPrincipal(QMainWindow):
                     print("El valor del peso no es válido")
                     
         if (event.key() == Qt.Key_Minus):
+            self.tablaDePesos.setCurrentCell(0, 1)
+            self.setFocus()
             if (self.ui.frmEditarTaraAlerta.isVisible()):
                 self.ui.frmSombra.setHidden(True)
                 self.ui.frmEditarTaraAlerta.setHidden(True)
@@ -678,6 +917,36 @@ class AplicacionPrincipal(QMainWindow):
                 self.ui.frmSombra.setHidden(True)
                 self.ui.frmIngresarNuevaTara.setHidden(True)
                 frmIngresarNuevaTara = False
+            if (self.ui.frmSeleccionarEditarPesada.isVisible()):
+                self.ui.frmSombra.setHidden(True)
+                self.ui.frmSeleccionarEditarPesada.setHidden(True)
+                frmSeleccionarEditarPesada = False
+            if (self.ui.frmEditarOEliminarPesadaAlerta.isVisible()):
+                self.ui.frmSombra.setHidden(True)
+                self.ui.frmEditarOEliminarPesadaAlerta.setHidden(True)
+                frmEditarOEliminarPesadaAlerta = False
+            if (self.ui.frmIngresarPassword.isVisible()):
+                self.ui.frmSombra.setHidden(True)
+                self.ui.frmIngresarPassword.setHidden(True)
+                frmIngresarPassword = False
+            if (self.ui.frmAlertaEliminar.isVisible()):
+                self.ui.frmSombra.setHidden(True)
+                self.ui.frmAlertaEliminar.setHidden(True)
+                frmAlertaEliminar = False
+            if (self.ui.frmAlertaEditarCodigoUsuario.isVisible()):
+                self.ui.frmSombra.setHidden(True)
+                self.ui.frmAlertaEditarCodigoUsuario.setHidden(True)
+                frmAlertaEditarCodigoUsuario = False
+            if (self.ui.frmEditarPresentacion.isVisible()):
+                self.ui.frmSombra.setHidden(True)
+                self.ui.frmEditarPresentacion.setHidden(True)
+                frmEditarPresentacion = False
+            if (self.ui.frmIngresarPasswordAdministrador.isVisible()):
+                self.ui.frmSombra.setHidden(True)
+                self.ui.frmIngresarPasswordAdministrador.setHidden(True)
+                frmIngresarPasswordAdministradorTara = False
+                frmIngresarPasswordAdministradorEditarPesada = False
+                frmIngresarPasswordAdministradorDescuento = False
     
     # ======================== Termina eventos con el Teclado ========================
     
@@ -709,6 +978,35 @@ class AplicacionPrincipal(QMainWindow):
         else:
             self.ui.txtNombreDelColaborador.setText("*****")
             codigoColaborador = 0
+            
+    def fn_recepcionaCodigoColaboradorNuevo(self):
+        global codigoColaboradorNuevo
+        
+        sender = self.sender()
+
+        if sender is not None and isinstance(sender, QLineEdit):
+            texto = sender.text()
+
+            texto_valido = ''.join(filter(str.isdigit, texto))
+
+            sender.setText(texto_valido)
+        
+        txtIngresarNuevoCodigoColaborador = self.ui.txtIngresarNuevoCodigoColaborador.text()
+
+        if (txtIngresarNuevoCodigoColaborador != "" and len(txtIngresarNuevoCodigoColaborador) >= 1):
+
+            nombreClienteSeleccionar = self.conexion.db_buscaCliente(txtIngresarNuevoCodigoColaborador)
+
+            if (len(nombreClienteSeleccionar) > 0):
+                self.ui.lblNuevoCodigoColaborador.setText(str(nombreClienteSeleccionar[0][0]))
+                codigoColaboradorNuevo = nombreClienteSeleccionar[0][1]
+            else:
+                self.ui.lblNuevoCodigoColaborador.setText("COLABORADOR NO ENCONTRADO")
+                codigoColaboradorNuevo = 0
+                
+        else:
+            self.ui.lblNuevoCodigoColaborador.setText("*****")
+            codigoColaboradorNuevo = 0
     
     def fn_asignaPesosMaximosYTaras(self):
         global pesoMaximoTalloSolo

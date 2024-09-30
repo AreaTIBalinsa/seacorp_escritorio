@@ -90,7 +90,7 @@ class Conectar():
     def db_traerAcumuladoProceso(self, numeroProceso):
         try:
             cursor = self.conexionsql.cursor()
-            sql = "SELECT SUM(pesoNeto) FROM tb_pesadas WHERE idProceso = %s"
+            sql = "SELECT SUM(pesoNeto) FROM tb_pesadas WHERE idProceso = %s AND estadoPesada = 1"
             cursor.execute(sql, (numeroProceso,))
             resultado = cursor.fetchone()
             return resultado[0] if resultado else None
@@ -101,7 +101,7 @@ class Conectar():
     def db_traerAcumuladoLote(self, numeroProceso, numeroLote):
         try:
             cursor = self.conexionsql.cursor()
-            sql = "SELECT SUM(pesoNeto) FROM tb_pesadas WHERE idProceso = %s AND idLote = %s"
+            sql = "SELECT SUM(pesoNeto) FROM tb_pesadas WHERE idProceso = %s AND idLote = %s AND estadoPesada = 1"
             cursor.execute(sql, (numeroProceso,numeroLote))
             resultado = cursor.fetchone()
             return resultado[0] if resultado else None
@@ -151,18 +151,18 @@ class Conectar():
                     IFNULL(CONCAT_WS(' ', nombresEmpleado, apellidoPaternoEmple, apellidoMaternoEmple), '') AS nombreCompleto,
                     especie,
                     pesoNeto,
-                    IFNULL((SELECT SUM(pesoNeto) FROM tb_pesadas WHERE especie = "TALLO SOLO" AND fech_InicioProc = %s AND idProceso = %s AND idLote = %s AND idPesada <= p.idPesada AND codigoUsuario = p.codigoUsuario), 0) AS acumuladoTalloSolo, 
-                    IFNULL((SELECT SUM(pesoNeto) FROM tb_pesadas WHERE especie = "TALLO CORAL" AND fech_InicioProc = %s AND idProceso = %s AND idLote = %s AND idPesada <= p.idPesada AND codigoUsuario = p.codigoUsuario), 0) AS acumuladoTalloCoral,
-                    IFNULL((SELECT SUM(pesoNeto) FROM tb_pesadas WHERE especie = "MEDIA VALVA T/S" AND fech_InicioProc = %s AND idProceso = %s AND idLote = %s AND idPesada <= p.idPesada AND codigoUsuario = p.codigoUsuario), 0) AS acumuladoMediaValvaTalloSolo, 
-                    IFNULL((SELECT SUM(pesoNeto) FROM tb_pesadas WHERE especie = "MEDIA VALVA T/C" AND fech_InicioProc = %s AND idProceso = %s AND idLote = %s AND idPesada <= p.idPesada AND codigoUsuario = p.codigoUsuario), 0) AS acumuladoMediaValvaTalloCoral, 
-                    IFNULL((SELECT SUM(pesoNeto) FROM tb_pesadas WHERE especie = "OTROS" AND fech_InicioProc = %s AND idProceso = %s AND idLote = %s AND idPesada <= p.idPesada AND codigoUsuario = p.codigoUsuario), 0) AS acumuladoOtros, 
+                    IFNULL((SELECT SUM(pesoNeto) FROM tb_pesadas WHERE especie = "TALLO SOLO" AND fech_InicioProc = %s AND idProceso = %s AND idLote = %s AND p.estadoPesada = 1 AND idPesada <= p.idPesada AND codigoUsuario = p.codigoUsuario), 0) AS acumuladoTalloSolo, 
+                    IFNULL((SELECT SUM(pesoNeto) FROM tb_pesadas WHERE especie = "TALLO CORAL" AND fech_InicioProc = %s AND idProceso = %s AND idLote = %s AND p.estadoPesada = 1 AND idPesada <= p.idPesada AND codigoUsuario = p.codigoUsuario), 0) AS acumuladoTalloCoral,
+                    IFNULL((SELECT SUM(pesoNeto) FROM tb_pesadas WHERE especie = "MEDIA VALVA T/S" AND fech_InicioProc = %s AND idProceso = %s AND idLote = %s AND p.estadoPesada = 1 AND idPesada <= p.idPesada AND codigoUsuario = p.codigoUsuario), 0) AS acumuladoMediaValvaTalloSolo, 
+                    IFNULL((SELECT SUM(pesoNeto) FROM tb_pesadas WHERE especie = "MEDIA VALVA T/C" AND fech_InicioProc = %s AND idProceso = %s AND idLote = %s AND p.estadoPesada = 1 AND idPesada <= p.idPesada AND codigoUsuario = p.codigoUsuario), 0) AS acumuladoMediaValvaTalloCoral, 
+                    IFNULL((SELECT SUM(pesoNeto) FROM tb_pesadas WHERE especie = "OTROS" AND fech_InicioProc = %s AND idProceso = %s AND idLote = %s AND p.estadoPesada = 1 AND idPesada <= p.idPesada AND codigoUsuario = p.codigoUsuario), 0) AS acumuladoOtros, 
                     p.horaPeso, 
                     idPesada
                 FROM
                     tb_pesadas p
                     INNER JOIN tb_empleados ON p.codigoUsuario = tb_empleados.codigo
                 WHERE
-                    p.fech_InicioProc = %s AND p.idProceso = %s AND p.idLote = %s
+                    p.fech_InicioProc = %s AND p.idProceso = %s AND p.idLote = %s AND p.estadoPesada = 1
                 ORDER BY
                     p.idPesada DESC
             """
@@ -178,3 +178,47 @@ class Conectar():
         except Exception as e:
             print("Error al ejecutar la consulta SQL:", e)
             return None
+        
+    def db_actualizaTaraPresentacion(self, presentacionEditarTara, nuevoValorTara):
+        try:
+            cursor = self.conexionsql.cursor()
+            sql = "UPDATE tb_especies SET tara = %s WHERE idEspecie = %s"
+            cursor.execute(sql, (nuevoValorTara, presentacionEditarTara))
+            self.conexionsql.commit()
+            cursor.close()
+        except Exception as e:
+            print("Error al ejecutar la consulta SQL:", e)
+            self.conexionsql.rollback()
+            
+    def db_eliminarRegistro(self, idPesadaEditarOEliminar):
+        try:
+            cursor = self.conexionsql.cursor()
+            sql = "UPDATE tb_pesadas SET estadoPesada = 0 WHERE idPesada = %s"
+            cursor.execute(sql, (idPesadaEditarOEliminar,))
+            self.conexionsql.commit()
+            cursor.close()
+        except Exception as e:
+            print("Error al ejecutar la consulta SQL:", e)
+            self.conexionsql.rollback()
+    
+    def db_actualizarCodigoColaboradorPesada(self, idPesadaEditarOEliminar, codigoColaboradorNuevo):
+        try:
+            cursor = self.conexionsql.cursor()
+            sql = "UPDATE tb_pesadas SET codigoUsuario = %s WHERE idPesada = %s"
+            cursor.execute(sql, (codigoColaboradorNuevo,idPesadaEditarOEliminar))
+            self.conexionsql.commit()
+            cursor.close()
+        except Exception as e:
+            print("Error al ejecutar la consulta SQL:", e)
+            self.conexionsql.rollback()
+    
+    def db_actualizarEspeciePesada(self, idPesadaEditarOEliminar, codigoNuevaEspecie):
+        try:
+            cursor = self.conexionsql.cursor()
+            sql = "UPDATE tb_pesadas SET especie = %s WHERE idPesada = %s"
+            cursor.execute(sql, (codigoNuevaEspecie, idPesadaEditarOEliminar))
+            self.conexionsql.commit()
+            cursor.close()
+        except Exception as e:
+            print("Error al ejecutar la consulta SQL:", e)
+            self.conexionsql.rollback()
