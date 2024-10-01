@@ -162,12 +162,12 @@ class Conectar():
                     IFNULL(CONCAT_WS(' ', nombresEmpleado, apellidoPaternoEmple, apellidoMaternoEmple), '') AS nombreCompleto,
                     especie,
                     pesoNeto,
-                    IFNULL((SELECT SUM(pesoNeto) FROM tb_pesadas WHERE especie = "TALLO SOLO" AND fech_InicioProc = %s AND idProceso = %s AND idLote = %s AND p.estadoPesada = 1 AND idPesada <= p.idPesada AND codigoUsuario = p.codigoUsuario), 0) AS acumuladoTalloSolo, 
-                    IFNULL((SELECT SUM(pesoNeto) FROM tb_pesadas WHERE especie = "TALLO CORAL" AND fech_InicioProc = %s AND idProceso = %s AND idLote = %s AND p.estadoPesada = 1 AND idPesada <= p.idPesada AND codigoUsuario = p.codigoUsuario), 0) AS acumuladoTalloCoral,
-                    IFNULL((SELECT SUM(pesoNeto) FROM tb_pesadas WHERE especie = "MEDIA VALVA T/S" AND fech_InicioProc = %s AND idProceso = %s AND idLote = %s AND p.estadoPesada = 1 AND idPesada <= p.idPesada AND codigoUsuario = p.codigoUsuario), 0) AS acumuladoMediaValvaTalloSolo, 
-                    IFNULL((SELECT SUM(pesoNeto) FROM tb_pesadas WHERE especie = "MEDIA VALVA T/C" AND fech_InicioProc = %s AND idProceso = %s AND idLote = %s AND p.estadoPesada = 1 AND idPesada <= p.idPesada AND codigoUsuario = p.codigoUsuario), 0) AS acumuladoMediaValvaTalloCoral, 
-                    IFNULL((SELECT SUM(pesoNeto) FROM tb_pesadas WHERE especie = "OTROS" AND fech_InicioProc = %s AND idProceso = %s AND idLote = %s AND p.estadoPesada = 1 AND idPesada <= p.idPesada AND codigoUsuario = p.codigoUsuario), 0) AS acumuladoOtros, 
-                    p.horaPeso, 
+                    IFNULL((SELECT SUM(pesoNeto) FROM tb_pesadas WHERE especie = "TALLO SOLO" AND fech_InicioProc = %s AND idProceso = %s AND p.estadoPesada = 1 AND idPesada <= p.idPesada AND codigoUsuario = p.codigoUsuario), 0) AS acumuladoTalloSolo, 
+                    IFNULL((SELECT SUM(pesoNeto) FROM tb_pesadas WHERE especie = "TALLO CORAL" AND fech_InicioProc = %s AND idProceso = %s AND p.estadoPesada = 1 AND idPesada <= p.idPesada AND codigoUsuario = p.codigoUsuario), 0) AS acumuladoTalloCoral,
+                    IFNULL((SELECT SUM(pesoNeto) FROM tb_pesadas WHERE especie = "MEDIA VALVA T/S" AND fech_InicioProc = %s AND idProceso = %s AND p.estadoPesada = 1 AND idPesada <= p.idPesada AND codigoUsuario = p.codigoUsuario), 0) AS acumuladoMediaValvaTalloSolo, 
+                    IFNULL((SELECT SUM(pesoNeto) FROM tb_pesadas WHERE especie = "MEDIA VALVA T/C" AND fech_InicioProc = %s AND idProceso = %s AND p.estadoPesada = 1 AND idPesada <= p.idPesada AND codigoUsuario = p.codigoUsuario), 0) AS acumuladoMediaValvaTalloCoral, 
+                    IFNULL((SELECT SUM(pesoNeto) FROM tb_pesadas WHERE especie = "OTROS" AND fech_InicioProc = %s AND idProceso = %s AND p.estadoPesada = 1 AND idPesada <= p.idPesada AND codigoUsuario = p.codigoUsuario), 0) AS acumuladoOtros, 
+                    p.horaPeso,
                     idPesada
                 FROM
                     tb_pesadas p
@@ -177,11 +177,11 @@ class Conectar():
                 ORDER BY
                     p.idPesada DESC
             """
-            cursor.execute(sql, (fechaInicioProceso, numeroProceso, numeroLote,
-                                fechaInicioProceso, numeroProceso, numeroLote,
-                                fechaInicioProceso, numeroProceso, numeroLote,
-                                fechaInicioProceso, numeroProceso, numeroLote,
-                                fechaInicioProceso, numeroProceso, numeroLote,
+            cursor.execute(sql, (fechaInicioProceso, numeroProceso,
+                                fechaInicioProceso, numeroProceso,
+                                fechaInicioProceso, numeroProceso,
+                                fechaInicioProceso, numeroProceso,
+                                fechaInicioProceso, numeroProceso,
                                 fechaInicioProceso, numeroProceso, numeroLote))
             resultado = cursor.fetchall()
             cursor.close()

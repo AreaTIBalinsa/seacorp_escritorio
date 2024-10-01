@@ -5586,9 +5586,9 @@ border: 2px solid #bbbbbb;</string>
     <zorder>frmIngresarPasswordAdministrador</zorder>
     <zorder>frmAlertaEditarCodigoUsuario</zorder>
     <zorder>frmEditarPresentacion</zorder>
-    <zorder>frmAlerta</zorder>
     <zorder>frmDescuentoAlerta</zorder>
     <zorder>frmAlertaDescuentoCodigoUsuario</zorder>
+    <zorder>frmAlerta</zorder>
    </widget>
   </widget>
  </widget>

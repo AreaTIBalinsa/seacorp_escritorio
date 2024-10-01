@@ -2499,9 +2499,9 @@ class Ui_MainWindow(object):
         self.frmIngresarPasswordAdministrador.raise_()
         self.frmAlertaEditarCodigoUsuario.raise_()
         self.frmEditarPresentacion.raise_()
-        self.frmAlerta.raise_()
         self.frmDescuentoAlerta.raise_()
         self.frmAlertaDescuentoCodigoUsuario.raise_()
+        self.frmAlerta.raise_()
         MainWindow.setCentralWidget(self.centralwidget)
 
         self.retranslateUi(MainWindow)
