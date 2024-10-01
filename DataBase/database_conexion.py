@@ -19,6 +19,17 @@ class Conectar():
         except Exception as e:
             print("Error al ejecutar la consulta SQL:", e)
             return None
+        
+    def db_extraerPassword(self):
+        try:
+            cursor = self.conexionsql.cursor()
+            sql = "SELECT passOperador FROM tb_configuracion"
+            cursor.execute(sql)
+            resultado = cursor.fetchone()
+            return resultado[0] if resultado else None
+        except Exception as e:
+            print("Error al ejecutar la consulta SQL:", e)
+            return None
     
     def db_traerPesosMaximosYTaras(self):
         try:
@@ -217,6 +228,17 @@ class Conectar():
             cursor = self.conexionsql.cursor()
             sql = "UPDATE tb_pesadas SET especie = %s WHERE idPesada = %s"
             cursor.execute(sql, (codigoNuevaEspecie, idPesadaEditarOEliminar))
+            self.conexionsql.commit()
+            cursor.close()
+        except Exception as e:
+            print("Error al ejecutar la consulta SQL:", e)
+            self.conexionsql.rollback()
+            
+    def db_aplicarDescuentoPersonal(self, numeroProceso, numeroLote, fechaInicioProceso, horaDescuento, presentacionDescuento, txtIngresarPesoDescuento, codigoColaboradorDescuento):
+        try:
+            cursor = self.conexionsql.cursor()
+            sql = "INSERT INTO tb_descuentos (idProceso , idLote, fecha, hora, especie, pesoDescuento, codigoUsuario) VALUES (%s, %s, %s, %s, %s, %s, %s)"
+            cursor.execute(sql,(numeroProceso, numeroLote, fechaInicioProceso, horaDescuento, presentacionDescuento, txtIngresarPesoDescuento, codigoColaboradorDescuento))
             self.conexionsql.commit()
             cursor.close()
         except Exception as e:

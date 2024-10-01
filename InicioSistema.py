@@ -69,6 +69,9 @@ frmIngresarPassword = False
 frmAlertaEliminar = False
 frmAlertaEditarCodigoUsuario = False
 frmEditarPresentacion = False
+frmAlertaDescuentoCodigoUsuario = False
+frmAlertaDescuentoSeleccionaEspecie = False
+frmAlertaDescuentoIngresaPeso = False
 
 frmIngresarPasswordAdministradorTara = False
 frmIngresarPasswordAdministradorEditarPesada = False
@@ -77,6 +80,9 @@ frmIngresarPasswordAdministradorDescuento = False
 presentacionEditarTara = 0
 idPesadaEditarOEliminar = 0
 codigoColaboradorNuevo = 0
+codigoColaboradorDescuento = 0
+
+presentacionDescuento = ""
 
 passwordEliminar = ""
 
@@ -329,10 +335,14 @@ class AplicacionPrincipal(QMainWindow):
             # self.workerBase.start()
             
             self.fn_asignaPesosMaximosYTaras()
+            self.fn_asignarPassword()
             
             self.ui.txtCodigoColaborador.textChanged.connect(self.fn_recepcionaCodigoColaborador)
             self.ui.txtIngresarNuevoCodigoColaborador.textChanged.connect(self.fn_recepcionaCodigoColaboradorNuevo)
+            self.ui.txtIngresarCodigoColaboradorDescuento.textChanged.connect(self.fn_recepcionaCodigoColaboradorDescuento)
             self.ui.txtIngresarNuevaTara.textChanged.connect(self.fn_validarEntradaNumerica)
+            self.ui.txtIngresarPesoDescuento.textChanged.connect(self.fn_validarEntradaNumericaDecimal)
+            self.ui.txtNumeroDePesada.textChanged.connect(self.fn_validarEntradaNumerica)
             
             self.ui.imgPanera.setHidden(True)
             self.ui.txtCodigoColaborador.setEnabled(False)
@@ -351,6 +361,8 @@ class AplicacionPrincipal(QMainWindow):
             self.ui.frmIngresarPasswordAdministrador.setHidden(True)
             self.ui.frmAlertaEditarCodigoUsuario.setHidden(True)
             self.ui.frmEditarPresentacion.setHidden(True)
+            self.ui.frmAlertaDescuentoCodigoUsuario.setHidden(True)
+            self.ui.frmDescuentoAlerta.setHidden(True)
             self.ui.frmSombra.setHidden(True)
             self.ui.frmAlerta.setHidden(True)
             
@@ -412,6 +424,22 @@ class AplicacionPrincipal(QMainWindow):
             texto_valido = ''.join(filter(str.isdigit, texto))
 
             sender.setText(texto_valido)
+            
+    def fn_validarEntradaNumericaDecimal(self):
+        sender = self.sender()
+
+        if sender is not None and isinstance(sender, QLineEdit):
+            texto = sender.text()
+
+            texto_valido = ''.join(c for i, c in enumerate(texto) if c.isdigit() or (c == '.' and texto.count('.') == 1))
+
+            sender.setText(texto_valido)
+            
+    def fn_asignarPassword(self):
+        global passwordEliminar
+        
+        resultadoPassword = self.conexion.db_extraerPassword()
+        passwordEliminar = resultadoPassword
         
     def fn_modal_principal(self):
         global pesoMaximo
@@ -497,7 +525,7 @@ class AplicacionPrincipal(QMainWindow):
                 pesoIndicador = pesoIndicador - pesoTara
                 
                 if(pesoIndicador > 0):
-                    if(captaCodigo == False):
+                    if(captaCodigo == False and self.condiciones_base() and self.condiciones_alertas()):
                         self.ui.imgPanera.setHidden(False)
                         self.ui.imgFlechaDerecha.setHidden(True)
                         self.ui.imgFlechaIzquierda.setHidden(True)
@@ -579,6 +607,9 @@ class AplicacionPrincipal(QMainWindow):
             not frmIngresarPasswordAdministradorDescuento and
             not frmAlertaEditarCodigoUsuario and
             not frmEditarPresentacion and
+            not frmAlertaDescuentoCodigoUsuario and
+            not frmAlertaDescuentoSeleccionaEspecie and
+            not frmAlertaDescuentoIngresaPeso and
             not frmAlertaEliminar
         )
         
@@ -594,6 +625,8 @@ class AplicacionPrincipal(QMainWindow):
             not self.ui.frmAlertaEliminar.isVisible() and
             not self.ui.frmAlertaEditarCodigoUsuario.isVisible() and
             not self.ui.frmEditarPresentacion.isVisible() and
+            not self.ui.frmDescuentoAlerta.isVisible() and
+            not self.ui.frmAlertaDescuentoCodigoUsuario.isVisible() and
             not self.ui.frmSombra.isVisible() and
             not self.ui.frmAlerta.isVisible()
         )
@@ -609,6 +642,8 @@ class AplicacionPrincipal(QMainWindow):
             not self.ui.frmIngresarPasswordAdministrador.isVisible() and
             not self.ui.frmAlertaEditarCodigoUsuario.isVisible() and
             not self.ui.frmEditarPresentacion.isVisible() and
+            not self.ui.frmDescuentoAlerta.isVisible() and
+            not self.ui.frmAlertaDescuentoCodigoUsuario.isVisible() and
             not self.ui.frmAlertaEliminar.isVisible()
         )
          
@@ -625,6 +660,9 @@ class AplicacionPrincipal(QMainWindow):
         global frmAlertaEliminar
         global frmAlertaEditarCodigoUsuario
         global frmEditarPresentacion
+        global frmAlertaDescuentoCodigoUsuario
+        global frmAlertaDescuentoSeleccionaEspecie
+        global frmAlertaDescuentoIngresaPeso
         
         global frmIngresarPasswordAdministradorTara
         global frmIngresarPasswordAdministradorEditarPesada
@@ -633,6 +671,8 @@ class AplicacionPrincipal(QMainWindow):
         global presentacionEditarTara
         global idPesadaEditarOEliminar
         global codigoColaboradorNuevo
+        global codigoColaboradorDescuento
+        global presentacionDescuento
         
         if (event.key() == Qt.Key_1) and self.ui.frmFinalizarAlerta.isVisible() and frmFinalizarAlerta:
             if acumuladoLote != 0:
@@ -656,89 +696,39 @@ class AplicacionPrincipal(QMainWindow):
             frmFinalizarAlerta = False
             
         if (event.key() == Qt.Key_1) and self.ui.frmEditarTaraAlerta.isVisible() and frmEditarTaraAlerta:
-            presentacionEditarTara = 1
-            frmEditarTaraAlerta = False
-            self.ui.frmEditarTaraAlerta.setHidden(True)
-            frmIngresarNuevaTara = True
-            self.ui.frmIngresarNuevaTara.setHidden(False)
-            self.ui.txtIngresarNuevaTara.setFocus(True)
+            self.fn_seleccionaTara(1)
         
         if (event.key() == Qt.Key_2) and self.ui.frmEditarTaraAlerta.isVisible() and frmEditarTaraAlerta:
-            presentacionEditarTara = 2
-            frmEditarTaraAlerta = False
-            self.ui.frmEditarTaraAlerta.setHidden(True)
-            frmIngresarNuevaTara = True
-            self.ui.frmIngresarNuevaTara.setHidden(False)
-            self.ui.txtIngresarNuevaTara.setFocus(True)
+            self.fn_seleccionaTara(2)
         
         if (event.key() == Qt.Key_3) and self.ui.frmEditarTaraAlerta.isVisible() and frmEditarTaraAlerta:
-            presentacionEditarTara = 3
-            frmEditarTaraAlerta = False
-            self.ui.frmEditarTaraAlerta.setHidden(True)
-            frmIngresarNuevaTara = True
-            self.ui.frmIngresarNuevaTara.setHidden(False)
-            self.ui.txtIngresarNuevaTara.setFocus(True)
+            self.fn_seleccionaTara(3)
         
         if (event.key() == Qt.Key_4) and self.ui.frmEditarTaraAlerta.isVisible() and frmEditarTaraAlerta:
-            presentacionEditarTara = 4
-            frmEditarTaraAlerta = False
-            self.ui.frmEditarTaraAlerta.setHidden(True)
-            frmIngresarNuevaTara = True
-            self.ui.frmIngresarNuevaTara.setHidden(False)
-            self.ui.txtIngresarNuevaTara.setFocus(True)
+            self.fn_seleccionaTara(4)
         
         if (event.key() == Qt.Key_5) and self.ui.frmEditarTaraAlerta.isVisible() and frmEditarTaraAlerta:
-            presentacionEditarTara = 5
-            frmEditarTaraAlerta = False
-            self.ui.frmEditarTaraAlerta.setHidden(True)
-            frmIngresarNuevaTara = True
-            self.ui.frmIngresarNuevaTara.setHidden(False)
-            self.ui.txtIngresarNuevaTara.setFocus(True)
+            self.fn_seleccionaTara(5)
             
         if (event.key() == Qt.Key_1) and self.ui.frmEditarPresentacion.isVisible() and frmEditarPresentacion:
-            codigoNuevaEspecie = "TALLO SOLO"
-            self.conexion.db_actualizarEspeciePesada(idPesadaEditarOEliminar, codigoNuevaEspecie)
-            self.ui.frmSombra.setHidden(True)
-            self.ui.frmEditarPresentacion.setHidden(True)
-            frmEditarPresentacion = False
-            self.fn_listarPesadas()
-            self.fn_alerta("ACTUALIZACIÓN CORRECTA!",correcto,"El registro se ha actualizado correctamente.")
+            codigoEspecie = "TALLO SOLO"
+            self.fn_actualizaEspeciePesada(codigoEspecie)
         
         if (event.key() == Qt.Key_2) and self.ui.frmEditarPresentacion.isVisible() and frmEditarPresentacion:
-            codigoNuevaEspecie = "TALLO CORAL"
-            self.conexion.db_actualizarEspeciePesada(idPesadaEditarOEliminar, codigoNuevaEspecie)
-            self.ui.frmSombra.setHidden(True)
-            self.ui.frmEditarPresentacion.setHidden(True)
-            frmEditarPresentacion = False
-            self.fn_listarPesadas()
-            self.fn_alerta("ACTUALIZACIÓN CORRECTA!",correcto,"El registro se ha actualizado correctamente.")
+            codigoEspecie = "TALLO CORAL"
+            self.fn_actualizaEspeciePesada(codigoEspecie)
         
         if (event.key() == Qt.Key_3) and self.ui.frmEditarPresentacion.isVisible() and frmEditarPresentacion:
-            codigoNuevaEspecie = "MEDIA VALVA T/S"
-            self.conexion.db_actualizarEspeciePesada(idPesadaEditarOEliminar, codigoNuevaEspecie)
-            self.ui.frmSombra.setHidden(True)
-            self.ui.frmEditarPresentacion.setHidden(True)
-            frmEditarPresentacion = False
-            self.fn_listarPesadas()
-            self.fn_alerta("ACTUALIZACIÓN CORRECTA!",correcto,"El registro se ha actualizado correctamente.")
+            codigoEspecie = "MEDIA VALVA T/S"
+            self.fn_actualizaEspeciePesada(codigoEspecie)
         
         if (event.key() == Qt.Key_4) and self.ui.frmEditarPresentacion.isVisible() and frmEditarPresentacion:
-            codigoNuevaEspecie = "MEDIA VALVA T/C"
-            self.conexion.db_actualizarEspeciePesada(idPesadaEditarOEliminar, codigoNuevaEspecie)
-            self.ui.frmSombra.setHidden(True)
-            self.ui.frmEditarPresentacion.setHidden(True)
-            frmEditarPresentacion = False
-            self.fn_listarPesadas()
-            self.fn_alerta("ACTUALIZACIÓN CORRECTA!",correcto,"El registro se ha actualizado correctamente.")
+            codigoEspecie = "MEDIA VALVA T/C"
+            self.fn_actualizaEspeciePesada(codigoEspecie)
         
         if (event.key() == Qt.Key_5) and self.ui.frmEditarPresentacion.isVisible() and frmEditarPresentacion:
-            codigoNuevaEspecie = "OTROS"
-            self.conexion.db_actualizarEspeciePesada(idPesadaEditarOEliminar, codigoNuevaEspecie)
-            self.ui.frmSombra.setHidden(True)
-            self.ui.frmEditarPresentacion.setHidden(True)
-            frmEditarPresentacion = False
-            self.fn_listarPesadas()
-            self.fn_alerta("ACTUALIZACIÓN CORRECTA!",correcto,"El registro se ha actualizado correctamente.")
+            codigoEspecie = "OTROS"
+            self.fn_actualizaEspeciePesada(codigoEspecie)
             
         if (event.key() == Qt.Key_Enter or event.key() == Qt.Key_Return) and self.ui.frmIngresarNuevaTara.isVisible() and frmIngresarNuevaTara:
             nuevoValorTara = self.ui.txtIngresarNuevaTara.text()
@@ -803,6 +793,72 @@ class AplicacionPrincipal(QMainWindow):
             self.ui.frmEditarOEliminarPesadaAlerta.setHidden(True)
             frmAlertaEliminar = True
             self.ui.frmAlertaEliminar.setHidden(False)
+            
+        if (event.key() == Qt.Key_1) and self.ui.frmAlertaDescuentoCodigoUsuario.isVisible() and frmAlertaDescuentoSeleccionaEspecie:
+            self.fn_seleccionarEspecieDescuento(1)
+        
+        if (event.key() == Qt.Key_2) and self.ui.frmAlertaDescuentoCodigoUsuario.isVisible() and frmAlertaDescuentoSeleccionaEspecie:
+            self.fn_seleccionarEspecieDescuento(2)
+        
+        if (event.key() == Qt.Key_3) and self.ui.frmAlertaDescuentoCodigoUsuario.isVisible() and frmAlertaDescuentoSeleccionaEspecie:
+            self.fn_seleccionarEspecieDescuento(3)
+        
+        if (event.key() == Qt.Key_4) and self.ui.frmAlertaDescuentoCodigoUsuario.isVisible() and frmAlertaDescuentoSeleccionaEspecie:
+            self.fn_seleccionarEspecieDescuento(4)
+        
+        if (event.key() == Qt.Key_5) and self.ui.frmAlertaDescuentoCodigoUsuario.isVisible() and frmAlertaDescuentoSeleccionaEspecie:
+            self.fn_seleccionarEspecieDescuento(5)
+            
+        if (event.key() == Qt.Key_Enter or event.key() == Qt.Key_Return) and self.ui.frmAlertaDescuentoCodigoUsuario.isVisible() and frmAlertaDescuentoIngresaPeso:
+            txtIngresarPesoDescuento = self.ui.txtIngresarPesoDescuento.text()
+            if txtIngresarPesoDescuento != "":
+                txtIngresarPesoDescuento = float(txtIngresarPesoDescuento)
+                if txtIngresarPesoDescuento != 0:
+                    frmAlertaDescuentoIngresaPeso = False
+                    self.ui.frmAlertaDescuentoCodigoUsuario.setHidden(True)
+                    self.fn_registrarDescuento()
+                else:
+                    self.fn_alerta("¡ERROR AL DESCONTAR!",error,"El valor no puede ser 0.",1000)
+            else:
+                self.fn_alerta("¡ERROR AL DESCONTAR!",error,"Debe ingresar un valor.",1000)
+        
+        if (event.key() == Qt.Key_Enter or event.key() == Qt.Key_Return) and self.ui.frmAlertaDescuentoCodigoUsuario.isVisible() and frmAlertaDescuentoSeleccionaEspecie:
+            if presentacionDescuento != "":
+                frmAlertaDescuentoSeleccionaEspecie = False
+                frmAlertaDescuentoIngresaPeso = True
+                self.ui.txtIngresarPesoDescuento.setEnabled(True)
+                self.ui.txtIngresarPesoDescuento.setFocus(True)
+                self.ui.txtIngresarPesoDescuento.setText("")
+            else:
+                self.fn_alerta("¡ERROR DE SELECCION!",error,"Debe seleccionar una presentación.",1000)
+        
+        if (event.key() == Qt.Key_Enter or event.key() == Qt.Key_Return) and self.ui.frmAlertaDescuentoCodigoUsuario.isVisible() and frmAlertaDescuentoCodigoUsuario:
+            if codigoColaboradorDescuento != 0:
+                frmAlertaDescuentoCodigoUsuario = False
+                frmAlertaDescuentoSeleccionaEspecie = True
+                self.ui.txtIngresarCodigoColaboradorDescuento.setFocus(False)
+                self.ui.txtIngresarCodigoColaboradorDescuento.setEnabled(False)
+            else:
+                self.fn_alerta("¡ERROR DE SELECCION!",error,"Debe seleccionar un colaborador.",1000)
+            
+        if (event.key() == Qt.Key_1) and self.ui.frmDescuentoAlerta.isVisible() and frmDescuentoAlerta and not frmAlertaDescuentoCodigoUsuario:
+            frmDescuentoAlerta = False
+            self.ui.frmDescuentoAlerta.setHidden(True)
+            frmAlertaDescuentoCodigoUsuario = True
+            self.ui.frmAlertaDescuentoCodigoUsuario.setHidden(False)
+            
+            self.ui.txtIngresarPesoDescuento.setFocus(False)
+            self.ui.txtIngresarPesoDescuento.setEnabled(False)
+            
+            self.ui.txtIngresarCodigoColaboradorDescuento.setEnabled(True)
+            self.ui.txtIngresarCodigoColaboradorDescuento.setFocus(True)
+            self.ui.txtIngresarCodigoColaboradorDescuento.setText("")
+            
+            codigoColaboradorDescuento = 0
+            presentacionDescuento = ""
+        
+        if (event.key() == Qt.Key_2) and self.ui.frmDescuentoAlerta.isVisible() and frmDescuentoAlerta:
+            pass
                 
         if (event.key() == Qt.Key_Enter or event.key() == Qt.Key_Return) and self.ui.frmSeleccionarEditarPesada.isVisible() and frmSeleccionarEditarPesada:
             numeroDePesada = int(self.ui.txtNumeroDePesada.text())
@@ -847,6 +903,17 @@ class AplicacionPrincipal(QMainWindow):
             else:
                 self.fn_alerta("¡CONTRASEÑA INCORRECTA!",error,"La contraseña es incorrecta.")
         
+        if (event.key() == Qt.Key_Enter or event.key() == Qt.Key_Return) and self.ui.frmIngresarPasswordAdministrador.isVisible() and frmIngresarPasswordAdministradorDescuento:
+            passwordExtraido = self.ui.txtPasswordAdministrador.text()
+            if str(passwordEliminar) == str(passwordExtraido):
+                frmIngresarPasswordAdministradorDescuento = False
+                self.ui.frmIngresarPasswordAdministrador.setHidden(True)
+                self.ui.frmSombra.setHidden(False)
+                self.ui.frmDescuentoAlerta.setHidden(False)
+                frmDescuentoAlerta = True
+            else:
+                self.fn_alerta("¡CONTRASEÑA INCORRECTA!",error,"La contraseña es incorrecta.")
+        
         if not self.ui.txtCodigoColaborador.hasFocus() and self.condiciones_base() and self.condiciones_alertas():
             self.tablaDePesos.setCurrentCell(0, 1)
             self.setFocus()
@@ -882,6 +949,13 @@ class AplicacionPrincipal(QMainWindow):
                 
             if (event.key() == Qt.Key_7) and self.condiciones_base() and self.condiciones_alertas():
                 frmIngresarPasswordAdministradorEditarPesada = True
+                self.ui.frmSombra.setHidden(False)
+                self.ui.frmIngresarPasswordAdministrador.setHidden(False)
+                self.ui.txtPasswordAdministrador.setText("")
+                self.ui.txtPasswordAdministrador.setFocus(True)
+            
+            if (event.key() == Qt.Key_8) and self.condiciones_base() and self.condiciones_alertas():
+                frmIngresarPasswordAdministradorDescuento = True
                 self.ui.frmSombra.setHidden(False)
                 self.ui.frmIngresarPasswordAdministrador.setHidden(False)
                 self.ui.txtPasswordAdministrador.setText("")
@@ -941,6 +1015,16 @@ class AplicacionPrincipal(QMainWindow):
                 self.ui.frmSombra.setHidden(True)
                 self.ui.frmEditarPresentacion.setHidden(True)
                 frmEditarPresentacion = False
+            if (self.ui.frmDescuentoAlerta.isVisible()):
+                self.ui.frmSombra.setHidden(True)
+                self.ui.frmDescuentoAlerta.setHidden(True)
+                frmDescuentoAlerta = False
+            if (self.ui.frmAlertaDescuentoCodigoUsuario.isVisible()):
+                self.ui.frmSombra.setHidden(True)
+                self.ui.frmAlertaDescuentoCodigoUsuario.setHidden(True)
+                frmAlertaDescuentoCodigoUsuario = False
+                frmAlertaDescuentoSeleccionaEspecie = False
+                frmAlertaDescuentoIngresaPeso = False
             if (self.ui.frmIngresarPasswordAdministrador.isVisible()):
                 self.ui.frmSombra.setHidden(True)
                 self.ui.frmIngresarPasswordAdministrador.setHidden(True)
@@ -1008,6 +1092,35 @@ class AplicacionPrincipal(QMainWindow):
             self.ui.lblNuevoCodigoColaborador.setText("*****")
             codigoColaboradorNuevo = 0
     
+    def fn_recepcionaCodigoColaboradorDescuento(self):
+        global codigoColaboradorDescuento
+        
+        sender = self.sender()
+
+        if sender is not None and isinstance(sender, QLineEdit):
+            texto = sender.text()
+
+            texto_valido = ''.join(filter(str.isdigit, texto))
+
+            sender.setText(texto_valido)
+        
+        txtIngresarCodigoColaboradorDescuento = self.ui.txtIngresarCodigoColaboradorDescuento.text()
+
+        if (txtIngresarCodigoColaboradorDescuento != "" and len(txtIngresarCodigoColaboradorDescuento) >= 1):
+
+            nombreClienteSeleccionar = self.conexion.db_buscaCliente(txtIngresarCodigoColaboradorDescuento)
+
+            if (len(nombreClienteSeleccionar) > 0):
+                self.ui.lblCodigoColaboradorDescuento.setText(str(nombreClienteSeleccionar[0][0]))
+                codigoColaboradorDescuento = nombreClienteSeleccionar[0][1]
+            else:
+                self.ui.lblCodigoColaboradorDescuento.setText("COLABORADOR NO ENCONTRADO")
+                codigoColaboradorDescuento = 0
+                
+        else:
+            self.ui.lblCodigoColaboradorDescuento.setText("*****")
+            codigoColaboradorDescuento = 0
+    
     def fn_asignaPesosMaximosYTaras(self):
         global pesoMaximoTalloSolo
         global pesoMaximoTalloCoral
@@ -1063,6 +1176,10 @@ class AplicacionPrincipal(QMainWindow):
         self.ui.lblMediaValvaTalloSolo.setStyleSheet("background-color: rgb(255, 255, 255); color: #000")
         self.ui.lblMediaValvaTalloCoral.setStyleSheet("background-color: rgb(255, 255, 255); color: #000")
         self.ui.lblOtros.setStyleSheet("background-color: rgb(255, 255, 255); color: #000")
+        
+        pesoMaximo = 0
+        pesoTara = 0
+        presentacion = ""
         
         if(especie == 1):
             pesoMaximo = pesoMaximoTalloSolo
@@ -1256,6 +1373,62 @@ class AplicacionPrincipal(QMainWindow):
         self.conexion.db_finalizarLote(numeroLote, numeroProceso, horaFinLote, acumuladoLote)
         
         self.fn_modal_principal()
+        
+    def fn_seleccionaTara(self, especie):
+        global presentacionEditarTara
+        global frmEditarTaraAlerta
+        global frmIngresarNuevaTara
+        
+        presentacionEditarTara = especie
+        frmEditarTaraAlerta = False
+        self.ui.frmEditarTaraAlerta.setHidden(True)
+        frmIngresarNuevaTara = True
+        self.ui.frmIngresarNuevaTara.setHidden(False)
+        self.ui.txtIngresarNuevaTara.setFocus(True)
+        
+    def fn_actualizaEspeciePesada(self, codigoEspecie):
+        global frmEditarPresentacion
+        
+        codigoNuevaEspecie = codigoEspecie
+        self.conexion.db_actualizarEspeciePesada(idPesadaEditarOEliminar, codigoNuevaEspecie)
+        self.ui.frmSombra.setHidden(True)
+        self.ui.frmEditarPresentacion.setHidden(True)
+        frmEditarPresentacion = False
+        self.fn_listarPesadas()
+        self.fn_alerta("ACTUALIZACIÓN CORRECTA!",correcto,"El registro se ha actualizado correctamente.")
+        
+    def fn_seleccionarEspecieDescuento(self, especie):
+        global presentacionDescuento
+        
+        self.ui.lblDescuentoPresentacionTalloSolo.setStyleSheet("color: rgb(255, 255, 255); border-top-left-radius: 10px; border-top-right-radius: 10px; background-color: rgb(29, 71, 131);")
+        self.ui.lblDescuentoPresentacionTalloCoral.setStyleSheet("color: rgb(255, 255, 255); border-top-left-radius: 10px; border-top-right-radius: 10px; background-color: rgb(29, 71, 131);")
+        self.ui.lblDescuentoPresentacionMediaValvaTalloSolo.setStyleSheet("color: rgb(255, 255, 255); border-top-left-radius: 10px; border-top-right-radius: 10px; background-color: rgb(29, 71, 131);")
+        self.ui.lblDescuentoPresentacionMediaValvaTalloCoral.setStyleSheet("color: rgb(255, 255, 255); border-top-left-radius: 10px; border-top-right-radius: 10px; background-color: rgb(29, 71, 131);")
+        self.ui.lblDescuentoPresentacionOtros.setStyleSheet("color: rgb(255, 255, 255); border-top-left-radius: 10px; border-top-right-radius: 10px; background-color: rgb(29, 71, 131);")
+        presentacionDescuento = ""
+        
+        if(especie == 1):
+            presentacionDescuento = "TALLO SOLO"
+            self.ui.lblDescuentoPresentacionTalloSolo.setStyleSheet("background-color: rgb(255, 207, 11); color: #000; border-top-left-radius: 10px; border-top-right-radius: 10px;")
+        elif(especie == 2):
+            presentacionDescuento = "TALLO CORAL"
+            self.ui.lblDescuentoPresentacionTalloCoral.setStyleSheet("background-color: rgb(255, 207, 11); color: #000; border-top-left-radius: 10px; border-top-right-radius: 10px;")
+        elif(especie == 3):
+            presentacionDescuento = "MEDIA VALVA T/S"
+            self.ui.lblDescuentoPresentacionMediaValvaTalloSolo.setStyleSheet("background-color: rgb(255, 207, 11); color: #000; border-top-left-radius: 10px; border-top-right-radius: 10px;")
+        elif(especie == 4):
+            presentacionDescuento = "MEDIA VALVA T/C"
+            self.ui.lblDescuentoPresentacionMediaValvaTalloCoral.setStyleSheet("background-color: rgb(255, 207, 11); color: #000; border-top-left-radius: 10px; border-top-right-radius: 10px;")
+        elif(especie == 5):
+            presentacionDescuento = "OTROS"
+            self.ui.lblDescuentoPresentacionOtros.setStyleSheet("background-color: rgb(255, 207, 11); color: #000; border-top-left-radius: 10px; border-top-right-radius: 10px;")
+            
+    def fn_registrarDescuento(self):
+        horaDescuento = datetime.now().strftime('%H:%M:%S')
+        txtIngresarPesoDescuento = self.ui.txtIngresarPesoDescuento.text()
+        self.conexion.db_aplicarDescuentoPersonal(numeroProceso, numeroLote, fechaInicioProceso, horaDescuento, presentacionDescuento, txtIngresarPesoDescuento, codigoColaboradorDescuento)
+        self.fn_listarPesadas()
+        self.fn_alerta("ACTUALIZACIÓN CORRECTA!",correcto,"El registro se ha actualizado correctamente.")
     
 # DISEÑADO Y DESARROLLADO POR SANTOS VILCHEZ EDINSON PASCUAL
 # LA UNIÓN - PIURA - PERU ; 2024
