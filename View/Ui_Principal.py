@@ -2489,6 +2489,270 @@ class Ui_MainWindow(object):
 "border: 2px solid #bbbbbb;")
         self.lblCerrarDescuentoColaborador.setAlignment(QtCore.Qt.AlignCenter)
         self.lblCerrarDescuentoColaborador.setObjectName("lblCerrarDescuentoColaborador")
+        self.frmAlertaDescuentoServis = QtWidgets.QFrame(self.frmSombra)
+        self.frmAlertaDescuentoServis.setGeometry(QtCore.QRect(410, 275, 780, 350))
+        self.frmAlertaDescuentoServis.setStyleSheet("#frmAlertaDescuentoServis{background-color: rgb(255, 255, 255);\n"
+"color: rgb(0, 0, 0);\n"
+"border:none;\n"
+"border-radius: 10px;\n"
+"border: 2px solid #D9D9D9;}")
+        self.frmAlertaDescuentoServis.setFrameShape(QtWidgets.QFrame.StyledPanel)
+        self.frmAlertaDescuentoServis.setFrameShadow(QtWidgets.QFrame.Raised)
+        self.frmAlertaDescuentoServis.setObjectName("frmAlertaDescuentoServis")
+        self.lblTituloDescuentoServis = QtWidgets.QLabel(self.frmAlertaDescuentoServis)
+        self.lblTituloDescuentoServis.setGeometry(QtCore.QRect(2, 2, 776, 50))
+        font = QtGui.QFont()
+        font.setFamily("Poppins")
+        font.setPointSize(18)
+        font.setBold(True)
+        font.setWeight(75)
+        self.lblTituloDescuentoServis.setFont(font)
+        self.lblTituloDescuentoServis.setStyleSheet("background-color: rgb(29, 71, 131);\n"
+"color: rgb(255, 255, 255);\n"
+"border-top-left-radius: 10px;\n"
+"border-top-right-radius: 10px;")
+        self.lblTituloDescuentoServis.setAlignment(QtCore.Qt.AlignCenter)
+        self.lblTituloDescuentoServis.setObjectName("lblTituloDescuentoServis")
+        self.lblCodigoServisDescuento = QtWidgets.QLabel(self.frmAlertaDescuentoServis)
+        self.lblCodigoServisDescuento.setGeometry(QtCore.QRect(250, 80, 500, 50))
+        font = QtGui.QFont()
+        font.setFamily("Poppins")
+        font.setPointSize(14)
+        font.setBold(True)
+        font.setWeight(75)
+        self.lblCodigoServisDescuento.setFont(font)
+        self.lblCodigoServisDescuento.setStyleSheet("background-color: rgb(210, 210, 210);\n"
+"color: #1D4783;\n"
+"border-radius: 10px;\n"
+"border: 2px solid #bbbbbb;")
+        self.lblCodigoServisDescuento.setAlignment(QtCore.Qt.AlignCenter)
+        self.lblCodigoServisDescuento.setObjectName("lblCodigoServisDescuento")
+        self.txtIngresarCodigoServisDescuento = QtWidgets.QLineEdit(self.frmAlertaDescuentoServis)
+        self.txtIngresarCodigoServisDescuento.setGeometry(QtCore.QRect(30, 80, 200, 50))
+        font = QtGui.QFont()
+        font.setFamily("Poppins")
+        font.setPointSize(14)
+        font.setBold(True)
+        font.setWeight(75)
+        self.txtIngresarCodigoServisDescuento.setFont(font)
+        self.txtIngresarCodigoServisDescuento.setStyleSheet("background-color: rgb(255, 255, 255);\n"
+"color: rgb(0, 0, 0);\n"
+"border-radius: 5px;\n"
+"border: 2px solid #000;\n"
+"padding: 5px")
+        self.txtIngresarCodigoServisDescuento.setText("")
+        self.txtIngresarCodigoServisDescuento.setAlignment(QtCore.Qt.AlignCenter)
+        self.txtIngresarCodigoServisDescuento.setObjectName("txtIngresarCodigoServisDescuento")
+        self.frmBtnTalloCoralDescuentoServis = QtWidgets.QFrame(self.frmAlertaDescuentoServis)
+        self.frmBtnTalloCoralDescuentoServis.setGeometry(QtCore.QRect(280, 160, 200, 70))
+        self.frmBtnTalloCoralDescuentoServis.setStyleSheet("#frmBtnTalloCoralDescuentoServis{\n"
+"background-color: rgb(255, 255, 255);\n"
+"border-radius: 10px;\n"
+"border: 2px solid #bbbbbb;\n"
+"}")
+        self.frmBtnTalloCoralDescuentoServis.setFrameShape(QtWidgets.QFrame.StyledPanel)
+        self.frmBtnTalloCoralDescuentoServis.setFrameShadow(QtWidgets.QFrame.Raised)
+        self.frmBtnTalloCoralDescuentoServis.setObjectName("frmBtnTalloCoralDescuentoServis")
+        self.lblPresione2EditarPresentacionServis = QtWidgets.QLabel(self.frmBtnTalloCoralDescuentoServis)
+        self.lblPresione2EditarPresentacionServis.setGeometry(QtCore.QRect(0, 40, 200, 30))
+        font = QtGui.QFont()
+        font.setFamily("Poppins")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        self.lblPresione2EditarPresentacionServis.setFont(font)
+        self.lblPresione2EditarPresentacionServis.setAlignment(QtCore.Qt.AlignCenter)
+        self.lblPresione2EditarPresentacionServis.setObjectName("lblPresione2EditarPresentacionServis")
+        self.lblDescuentoPresentacionTalloCoralServis = QtWidgets.QLabel(self.frmBtnTalloCoralDescuentoServis)
+        self.lblDescuentoPresentacionTalloCoralServis.setGeometry(QtCore.QRect(2, 2, 196, 38))
+        font = QtGui.QFont()
+        font.setFamily("Poppins")
+        font.setPointSize(12)
+        font.setBold(True)
+        font.setWeight(75)
+        self.lblDescuentoPresentacionTalloCoralServis.setFont(font)
+        self.lblDescuentoPresentacionTalloCoralServis.setStyleSheet("color: rgb(255, 255, 255);\n"
+"border-top-left-radius: 10px;\n"
+"border-top-right-radius: 10px;\n"
+"background-color: rgb(29, 71, 131);")
+        self.lblDescuentoPresentacionTalloCoralServis.setAlignment(QtCore.Qt.AlignCenter)
+        self.lblDescuentoPresentacionTalloCoralServis.setObjectName("lblDescuentoPresentacionTalloCoralServis")
+        self.frmBtnMediaValvaTalloSoloDescuentoServis = QtWidgets.QFrame(self.frmAlertaDescuentoServis)
+        self.frmBtnMediaValvaTalloSoloDescuentoServis.setGeometry(QtCore.QRect(530, 160, 200, 70))
+        self.frmBtnMediaValvaTalloSoloDescuentoServis.setStyleSheet("#frmBtnMediaValvaTalloSoloDescuentoServis{\n"
+"background-color: rgb(255, 255, 255);\n"
+"border-radius: 10px;\n"
+"border: 2px solid #bbbbbb;\n"
+"}")
+        self.frmBtnMediaValvaTalloSoloDescuentoServis.setFrameShape(QtWidgets.QFrame.StyledPanel)
+        self.frmBtnMediaValvaTalloSoloDescuentoServis.setFrameShadow(QtWidgets.QFrame.Raised)
+        self.frmBtnMediaValvaTalloSoloDescuentoServis.setObjectName("frmBtnMediaValvaTalloSoloDescuentoServis")
+        self.lblPresione3EditarPresentacionServis = QtWidgets.QLabel(self.frmBtnMediaValvaTalloSoloDescuentoServis)
+        self.lblPresione3EditarPresentacionServis.setGeometry(QtCore.QRect(0, 40, 200, 30))
+        font = QtGui.QFont()
+        font.setFamily("Poppins")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        self.lblPresione3EditarPresentacionServis.setFont(font)
+        self.lblPresione3EditarPresentacionServis.setAlignment(QtCore.Qt.AlignCenter)
+        self.lblPresione3EditarPresentacionServis.setObjectName("lblPresione3EditarPresentacionServis")
+        self.lblDescuentoPresentacionMediaValvaTalloSoloServis = QtWidgets.QLabel(self.frmBtnMediaValvaTalloSoloDescuentoServis)
+        self.lblDescuentoPresentacionMediaValvaTalloSoloServis.setGeometry(QtCore.QRect(2, 2, 196, 38))
+        font = QtGui.QFont()
+        font.setFamily("Poppins")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        self.lblDescuentoPresentacionMediaValvaTalloSoloServis.setFont(font)
+        self.lblDescuentoPresentacionMediaValvaTalloSoloServis.setStyleSheet("color: rgb(255, 255, 255);\n"
+"border-top-left-radius: 10px;\n"
+"border-top-right-radius: 10px;\n"
+"background-color: rgb(29, 71, 131);")
+        self.lblDescuentoPresentacionMediaValvaTalloSoloServis.setAlignment(QtCore.Qt.AlignCenter)
+        self.lblDescuentoPresentacionMediaValvaTalloSoloServis.setObjectName("lblDescuentoPresentacionMediaValvaTalloSoloServis")
+        self.frmBtnMediaValvaTalloCoralDescuentoServis = QtWidgets.QFrame(self.frmAlertaDescuentoServis)
+        self.frmBtnMediaValvaTalloCoralDescuentoServis.setGeometry(QtCore.QRect(30, 250, 200, 70))
+        self.frmBtnMediaValvaTalloCoralDescuentoServis.setStyleSheet("#frmBtnMediaValvaTalloCoralDescuentoServis{\n"
+"background-color: rgb(255, 255, 255);\n"
+"border-radius: 10px;\n"
+"border: 2px solid #bbbbbb;\n"
+"}")
+        self.frmBtnMediaValvaTalloCoralDescuentoServis.setFrameShape(QtWidgets.QFrame.StyledPanel)
+        self.frmBtnMediaValvaTalloCoralDescuentoServis.setFrameShadow(QtWidgets.QFrame.Raised)
+        self.frmBtnMediaValvaTalloCoralDescuentoServis.setObjectName("frmBtnMediaValvaTalloCoralDescuentoServis")
+        self.lblPresione4EditarPresentacionServis = QtWidgets.QLabel(self.frmBtnMediaValvaTalloCoralDescuentoServis)
+        self.lblPresione4EditarPresentacionServis.setGeometry(QtCore.QRect(0, 40, 200, 30))
+        font = QtGui.QFont()
+        font.setFamily("Poppins")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        self.lblPresione4EditarPresentacionServis.setFont(font)
+        self.lblPresione4EditarPresentacionServis.setAlignment(QtCore.Qt.AlignCenter)
+        self.lblPresione4EditarPresentacionServis.setObjectName("lblPresione4EditarPresentacionServis")
+        self.lblDescuentoPresentacionMediaValvaTalloCoralServis = QtWidgets.QLabel(self.frmBtnMediaValvaTalloCoralDescuentoServis)
+        self.lblDescuentoPresentacionMediaValvaTalloCoralServis.setGeometry(QtCore.QRect(2, 2, 196, 38))
+        font = QtGui.QFont()
+        font.setFamily("Poppins")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        self.lblDescuentoPresentacionMediaValvaTalloCoralServis.setFont(font)
+        self.lblDescuentoPresentacionMediaValvaTalloCoralServis.setStyleSheet("color: rgb(255, 255, 255);\n"
+"border-top-left-radius: 10px;\n"
+"border-top-right-radius: 10px;\n"
+"background-color: rgb(29, 71, 131);")
+        self.lblDescuentoPresentacionMediaValvaTalloCoralServis.setAlignment(QtCore.Qt.AlignCenter)
+        self.lblDescuentoPresentacionMediaValvaTalloCoralServis.setObjectName("lblDescuentoPresentacionMediaValvaTalloCoralServis")
+        self.frmBtnOtrosDescuentoServis = QtWidgets.QFrame(self.frmAlertaDescuentoServis)
+        self.frmBtnOtrosDescuentoServis.setGeometry(QtCore.QRect(280, 250, 200, 70))
+        self.frmBtnOtrosDescuentoServis.setStyleSheet("#frmBtnOtrosDescuentoServis{\n"
+"background-color: rgb(255, 255, 255);\n"
+"border-radius: 10px;\n"
+"border: 2px solid #bbbbbb;\n"
+"}")
+        self.frmBtnOtrosDescuentoServis.setFrameShape(QtWidgets.QFrame.StyledPanel)
+        self.frmBtnOtrosDescuentoServis.setFrameShadow(QtWidgets.QFrame.Raised)
+        self.frmBtnOtrosDescuentoServis.setObjectName("frmBtnOtrosDescuentoServis")
+        self.lblPresione5EditarPresentacionServis = QtWidgets.QLabel(self.frmBtnOtrosDescuentoServis)
+        self.lblPresione5EditarPresentacionServis.setGeometry(QtCore.QRect(0, 40, 200, 30))
+        font = QtGui.QFont()
+        font.setFamily("Poppins")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        self.lblPresione5EditarPresentacionServis.setFont(font)
+        self.lblPresione5EditarPresentacionServis.setAlignment(QtCore.Qt.AlignCenter)
+        self.lblPresione5EditarPresentacionServis.setObjectName("lblPresione5EditarPresentacionServis")
+        self.lblDescuentoPresentacionOtrosServis = QtWidgets.QLabel(self.frmBtnOtrosDescuentoServis)
+        self.lblDescuentoPresentacionOtrosServis.setGeometry(QtCore.QRect(2, 2, 196, 38))
+        font = QtGui.QFont()
+        font.setFamily("Poppins")
+        font.setPointSize(12)
+        font.setBold(True)
+        font.setWeight(75)
+        self.lblDescuentoPresentacionOtrosServis.setFont(font)
+        self.lblDescuentoPresentacionOtrosServis.setStyleSheet("color: rgb(255, 255, 255);\n"
+"border-top-left-radius: 10px;\n"
+"border-top-right-radius: 10px;\n"
+"background-color: rgb(29, 71, 131);")
+        self.lblDescuentoPresentacionOtrosServis.setAlignment(QtCore.Qt.AlignCenter)
+        self.lblDescuentoPresentacionOtrosServis.setObjectName("lblDescuentoPresentacionOtrosServis")
+        self.frmBtnTalloSoloDescuentoServis = QtWidgets.QFrame(self.frmAlertaDescuentoServis)
+        self.frmBtnTalloSoloDescuentoServis.setGeometry(QtCore.QRect(30, 160, 200, 70))
+        self.frmBtnTalloSoloDescuentoServis.setStyleSheet("#frmBtnTalloSoloDescuentoServis{\n"
+"background-color: rgb(255, 255, 255);\n"
+"border-radius: 10px;\n"
+"border: 2px solid #bbbbbb;\n"
+"}")
+        self.frmBtnTalloSoloDescuentoServis.setFrameShape(QtWidgets.QFrame.StyledPanel)
+        self.frmBtnTalloSoloDescuentoServis.setFrameShadow(QtWidgets.QFrame.Raised)
+        self.frmBtnTalloSoloDescuentoServis.setObjectName("frmBtnTalloSoloDescuentoServis")
+        self.lblPresione1EditarPresentacionServis = QtWidgets.QLabel(self.frmBtnTalloSoloDescuentoServis)
+        self.lblPresione1EditarPresentacionServis.setGeometry(QtCore.QRect(0, 40, 200, 30))
+        font = QtGui.QFont()
+        font.setFamily("Poppins")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        self.lblPresione1EditarPresentacionServis.setFont(font)
+        self.lblPresione1EditarPresentacionServis.setAlignment(QtCore.Qt.AlignCenter)
+        self.lblPresione1EditarPresentacionServis.setObjectName("lblPresione1EditarPresentacionServis")
+        self.lblDescuentoPresentacionTalloSoloServis = QtWidgets.QLabel(self.frmBtnTalloSoloDescuentoServis)
+        self.lblDescuentoPresentacionTalloSoloServis.setGeometry(QtCore.QRect(2, 2, 196, 38))
+        font = QtGui.QFont()
+        font.setFamily("Poppins")
+        font.setPointSize(12)
+        font.setBold(True)
+        font.setWeight(75)
+        self.lblDescuentoPresentacionTalloSoloServis.setFont(font)
+        self.lblDescuentoPresentacionTalloSoloServis.setStyleSheet("color: rgb(255, 255, 255);\n"
+"border-top-left-radius: 10px;\n"
+"border-top-right-radius: 10px;\n"
+"background-color: rgb(29, 71, 131);")
+        self.lblDescuentoPresentacionTalloSoloServis.setAlignment(QtCore.Qt.AlignCenter)
+        self.lblDescuentoPresentacionTalloSoloServis.setObjectName("lblDescuentoPresentacionTalloSoloServis")
+        self.lblIngresePesoDescontarServis = QtWidgets.QLabel(self.frmAlertaDescuentoServis)
+        self.lblIngresePesoDescontarServis.setGeometry(QtCore.QRect(530, 250, 200, 30))
+        font = QtGui.QFont()
+        font.setFamily("Poppins")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        self.lblIngresePesoDescontarServis.setFont(font)
+        self.lblIngresePesoDescontarServis.setAlignment(QtCore.Qt.AlignCenter)
+        self.lblIngresePesoDescontarServis.setObjectName("lblIngresePesoDescontarServis")
+        self.txtIngresarPesoDescuentoServis = QtWidgets.QLineEdit(self.frmAlertaDescuentoServis)
+        self.txtIngresarPesoDescuentoServis.setGeometry(QtCore.QRect(530, 280, 200, 40))
+        font = QtGui.QFont()
+        font.setFamily("Poppins")
+        font.setPointSize(12)
+        font.setBold(True)
+        font.setWeight(75)
+        self.txtIngresarPesoDescuentoServis.setFont(font)
+        self.txtIngresarPesoDescuentoServis.setStyleSheet("background-color: rgb(255, 255, 255);\n"
+"color: rgb(0, 0, 0);\n"
+"border-radius: 5px;\n"
+"border: 2px solid #000;\n"
+"padding: 5px")
+        self.txtIngresarPesoDescuentoServis.setText("")
+        self.txtIngresarPesoDescuentoServis.setAlignment(QtCore.Qt.AlignCenter)
+        self.txtIngresarPesoDescuentoServis.setObjectName("txtIngresarPesoDescuentoServis")
+        self.lblCerrarDescuentoServis = QtWidgets.QLabel(self.frmAlertaDescuentoServis)
+        self.lblCerrarDescuentoServis.setGeometry(QtCore.QRect(740, 10, 30, 30))
+        font = QtGui.QFont()
+        font.setFamily("Poppins")
+        font.setPointSize(20)
+        font.setBold(True)
+        font.setWeight(75)
+        self.lblCerrarDescuentoServis.setFont(font)
+        self.lblCerrarDescuentoServis.setStyleSheet("background-color: rgb(255, 0, 0);\n"
+"color: rgb(255, 255, 255);\n"
+"border-radius: 5px;\n"
+"border: 2px solid #bbbbbb;")
+        self.lblCerrarDescuentoServis.setAlignment(QtCore.Qt.AlignCenter)
+        self.lblCerrarDescuentoServis.setObjectName("lblCerrarDescuentoServis")
         self.frmFinalizarAlerta.raise_()
         self.frmEditarTaraAlerta.raise_()
         self.frmIngresarNuevaTara.raise_()
@@ -2502,6 +2766,7 @@ class Ui_MainWindow(object):
         self.frmDescuentoAlerta.raise_()
         self.frmAlertaDescuentoCodigoUsuario.raise_()
         self.frmAlerta.raise_()
+        self.frmAlertaDescuentoServis.raise_()
         MainWindow.setCentralWidget(self.centralwidget)
 
         self.retranslateUi(MainWindow)
@@ -2674,3 +2939,19 @@ class Ui_MainWindow(object):
         self.lblIngresePesoDescontar.setText(_translate("MainWindow", "INGRESE PESO A DESCONTAR"))
         self.txtIngresarPesoDescuento.setPlaceholderText(_translate("MainWindow", "Ingrese Peso"))
         self.lblCerrarDescuentoColaborador.setText(_translate("MainWindow", "-"))
+        self.lblTituloDescuentoServis.setText(_translate("MainWindow", ".::: DESCUENTO A SERVIS :::."))
+        self.lblCodigoServisDescuento.setText(_translate("MainWindow", "*****"))
+        self.txtIngresarCodigoServisDescuento.setPlaceholderText(_translate("MainWindow", "Ingrese Codigo"))
+        self.lblPresione2EditarPresentacionServis.setText(_translate("MainWindow", ".::: PRESIONE 2 :::."))
+        self.lblDescuentoPresentacionTalloCoralServis.setText(_translate("MainWindow", "TALLO CORAL"))
+        self.lblPresione3EditarPresentacionServis.setText(_translate("MainWindow", ".::: PRESIONE 3 :::."))
+        self.lblDescuentoPresentacionMediaValvaTalloSoloServis.setText(_translate("MainWindow", "MEDIA VALVA TALLO SOLO"))
+        self.lblPresione4EditarPresentacionServis.setText(_translate("MainWindow", ".::: PRESIONE 4 :::."))
+        self.lblDescuentoPresentacionMediaValvaTalloCoralServis.setText(_translate("MainWindow", "MEDIA VALVA TALLO CORAL"))
+        self.lblPresione5EditarPresentacionServis.setText(_translate("MainWindow", ".::: PRESIONE 5 :::."))
+        self.lblDescuentoPresentacionOtrosServis.setText(_translate("MainWindow", "OTROS"))
+        self.lblPresione1EditarPresentacionServis.setText(_translate("MainWindow", ".::: PRESIONE 1 :::."))
+        self.lblDescuentoPresentacionTalloSoloServis.setText(_translate("MainWindow", "TALLO SOLO"))
+        self.lblIngresePesoDescontarServis.setText(_translate("MainWindow", "INGRESE PESO A DESCONTAR"))
+        self.txtIngresarPesoDescuentoServis.setPlaceholderText(_translate("MainWindow", "Ingrese Peso"))
+        self.lblCerrarDescuentoServis.setText(_translate("MainWindow", "-"))

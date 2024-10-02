@@ -18,7 +18,7 @@ class Ui_Modal_Inicio(object):
         self.centralwidget = QtWidgets.QWidget(Modal_Inicio)
         self.centralwidget.setObjectName("centralwidget")
         self.frame = QtWidgets.QFrame(self.centralwidget)
-        self.frame.setGeometry(QtCore.QRect(215, 155, 1170, 590))
+        self.frame.setGeometry(QtCore.QRect(190, 150, 1220, 600))
         self.frame.setStyleSheet("#frame{\n"
 "    background-color: rgba(255, 255, 255, 140);\n"
 "    border-radius: 30px;\n"
@@ -28,39 +28,18 @@ class Ui_Modal_Inicio(object):
         self.frame.setFrameShadow(QtWidgets.QFrame.Raised)
         self.frame.setObjectName("frame")
         self.frameBtnReestablecer = QtWidgets.QFrame(self.frame)
-        self.frameBtnReestablecer.setGeometry(QtCore.QRect(75, 385, 304, 108))
-        self.frameBtnReestablecer.setStyleSheet("background-color: rgb(255, 255, 255);\n"
+        self.frameBtnReestablecer.setGeometry(QtCore.QRect(80, 370, 300, 100))
+        self.frameBtnReestablecer.setStyleSheet("#frameBtnReestablecer{\n"
+"background-color: rgb(255, 255, 255);\n"
 "background-color: rgba(255, 255, 255, 200);\n"
 "border-radius: 10px;\n"
-"border: none;")
+"border: none;\n"
+"}")
         self.frameBtnReestablecer.setFrameShape(QtWidgets.QFrame.StyledPanel)
         self.frameBtnReestablecer.setFrameShadow(QtWidgets.QFrame.Raised)
         self.frameBtnReestablecer.setObjectName("frameBtnReestablecer")
-        self.btnReestablecer = QtWidgets.QPushButton(self.frameBtnReestablecer)
-        self.btnReestablecer.setGeometry(QtCore.QRect(2, 2, 301, 71))
-        font = QtGui.QFont()
-        font.setFamily("Poppins")
-        font.setPointSize(12)
-        font.setBold(True)
-        font.setWeight(75)
-        self.btnReestablecer.setFont(font)
-        self.btnReestablecer.setStyleSheet("QPushButton {\n"
-"    background-color: transparent;\n"
-"    color: rgb(255, 255, 255);\n"
-"    border: none;\n"
-"}\n"
-"\n"
-"QPushButton:hover {\n"
-"    background-color: #4683FF;\n"
-"}\n"
-"\n"
-"QPushButton:pressed {\n"
-"    background-color: #0649D1;\n"
-"}")
-        self.btnReestablecer.setText("")
-        self.btnReestablecer.setObjectName("btnReestablecer")
         self.lblPresionarReestablecer = QtWidgets.QLabel(self.frameBtnReestablecer)
-        self.lblPresionarReestablecer.setGeometry(QtCore.QRect(0, 75, 301, 31))
+        self.lblPresionarReestablecer.setGeometry(QtCore.QRect(2, 66, 296, 32))
         font = QtGui.QFont()
         font.setFamily("Poppins")
         font.setPointSize(12)
@@ -68,16 +47,20 @@ class Ui_Modal_Inicio(object):
         font.setWeight(75)
         self.lblPresionarReestablecer.setFont(font)
         self.lblPresionarReestablecer.setLayoutDirection(QtCore.Qt.LeftToRight)
-        self.lblPresionarReestablecer.setStyleSheet("color: rgb(0, 0, 0);")
+        self.lblPresionarReestablecer.setStyleSheet("color: rgb(0, 0, 0);\n"
+"background-color: rgb(255, 255, 255);\n"
+"border-bottom-left-radius: 10px;\n"
+"border-bottom-right-radius: 10px;")
         self.lblPresionarReestablecer.setAlignment(QtCore.Qt.AlignCenter)
         self.lblPresionarReestablecer.setObjectName("lblPresionarReestablecer")
         self.lblImgReestablecer = QtWidgets.QLabel(self.frameBtnReestablecer)
-        self.lblImgReestablecer.setGeometry(QtCore.QRect(30, 15, 61, 41))
+        self.lblImgReestablecer.setGeometry(QtCore.QRect(40, 18, 35, 30))
         self.lblImgReestablecer.setStyleSheet("background-color: transparent;")
         self.lblImgReestablecer.setText("")
+        self.lblImgReestablecer.setScaledContents(True)
         self.lblImgReestablecer.setObjectName("lblImgReestablecer")
         self.lblReestablecer = QtWidgets.QLabel(self.frameBtnReestablecer)
-        self.lblReestablecer.setGeometry(QtCore.QRect(2, 2, 301, 71))
+        self.lblReestablecer.setGeometry(QtCore.QRect(2, 2, 296, 64))
         font = QtGui.QFont()
         font.setFamily("Poppins")
         font.setPointSize(14)
@@ -89,20 +72,22 @@ class Ui_Modal_Inicio(object):
         self.lblReestablecer.setStyleSheet("background-color: #0055FF;\n"
 "color: rgb(255, 255, 255);\n"
 "border: none;\n"
-"border-radius: 10px;\n"
+"border-top-left-radius: 10px;\n"
+"border-top-right-radius: 10px;\n"
 "padding-left: 30px;")
         self.lblReestablecer.setAlignment(QtCore.Qt.AlignCenter)
         self.lblReestablecer.setObjectName("lblReestablecer")
-        self.btnReestablecer.raise_()
         self.lblPresionarReestablecer.raise_()
         self.lblReestablecer.raise_()
         self.lblImgReestablecer.raise_()
         self.framebtnIniciarProceso = QtWidgets.QFrame(self.frame)
-        self.framebtnIniciarProceso.setGeometry(QtCore.QRect(793, 385, 304, 108))
-        self.framebtnIniciarProceso.setStyleSheet("background-color: rgb(255, 255, 255);\n"
+        self.framebtnIniciarProceso.setGeometry(QtCore.QRect(840, 370, 300, 100))
+        self.framebtnIniciarProceso.setStyleSheet("#framebtnIniciarProceso{\n"
+"background-color: rgb(255, 255, 255);\n"
 "background-color: rgba(255, 255, 255, 200);\n"
 "border-radius: 10px;\n"
-"border: none;")
+"border: none;\n"
+"}")
         self.framebtnIniciarProceso.setFrameShape(QtWidgets.QFrame.StyledPanel)
         self.framebtnIniciarProceso.setFrameShadow(QtWidgets.QFrame.Raised)
         self.framebtnIniciarProceso.setObjectName("framebtnIniciarProceso")
@@ -131,7 +116,7 @@ class Ui_Modal_Inicio(object):
         self.btnIniciarProceso.setText("")
         self.btnIniciarProceso.setObjectName("btnIniciarProceso")
         self.lblPresionarIniciarProceso = QtWidgets.QLabel(self.framebtnIniciarProceso)
-        self.lblPresionarIniciarProceso.setGeometry(QtCore.QRect(0, 75, 301, 31))
+        self.lblPresionarIniciarProceso.setGeometry(QtCore.QRect(0, 66, 296, 32))
         font = QtGui.QFont()
         font.setFamily("Poppins")
         font.setPointSize(12)
@@ -139,16 +124,20 @@ class Ui_Modal_Inicio(object):
         font.setWeight(75)
         self.lblPresionarIniciarProceso.setFont(font)
         self.lblPresionarIniciarProceso.setLayoutDirection(QtCore.Qt.LeftToRight)
-        self.lblPresionarIniciarProceso.setStyleSheet("color: rgb(0, 0, 0);")
+        self.lblPresionarIniciarProceso.setStyleSheet("color: rgb(0, 0, 0);\n"
+"background-color: rgb(255, 255, 255);\n"
+"border-bottom-left-radius: 10px;\n"
+"border-bottom-right-radius: 10px;")
         self.lblPresionarIniciarProceso.setAlignment(QtCore.Qt.AlignCenter)
         self.lblPresionarIniciarProceso.setObjectName("lblPresionarIniciarProceso")
         self.lblImgIniciarProceso = QtWidgets.QLabel(self.framebtnIniciarProceso)
-        self.lblImgIniciarProceso.setGeometry(QtCore.QRect(10, 16, 61, 41))
+        self.lblImgIniciarProceso.setGeometry(QtCore.QRect(20, 15, 60, 35))
         self.lblImgIniciarProceso.setStyleSheet("background-color: transparent;")
         self.lblImgIniciarProceso.setText("")
+        self.lblImgIniciarProceso.setScaledContents(True)
         self.lblImgIniciarProceso.setObjectName("lblImgIniciarProceso")
         self.lblIniciarProceso = QtWidgets.QLabel(self.framebtnIniciarProceso)
-        self.lblIniciarProceso.setGeometry(QtCore.QRect(2, 2, 301, 71))
+        self.lblIniciarProceso.setGeometry(QtCore.QRect(2, 2, 296, 64))
         font = QtGui.QFont()
         font.setFamily("Poppins")
         font.setPointSize(14)
@@ -160,8 +149,9 @@ class Ui_Modal_Inicio(object):
         self.lblIniciarProceso.setStyleSheet("background-color: #0055FF;\n"
 "color: rgb(255, 255, 255);\n"
 "border: none;\n"
-"border-radius: 10px;\n"
-"padding-left: 30px;")
+"border-top-left-radius: 10px;\n"
+"border-top-right-radius: 10px;\n"
+"padding-left: 50px;")
         self.lblIniciarProceso.setAlignment(QtCore.Qt.AlignCenter)
         self.lblIniciarProceso.setObjectName("lblIniciarProceso")
         self.btnIniciarProceso.raise_()
@@ -169,36 +159,18 @@ class Ui_Modal_Inicio(object):
         self.lblIniciarProceso.raise_()
         self.lblImgIniciarProceso.raise_()
         self.framebtnApagarEquipo = QtWidgets.QFrame(self.frame)
-        self.framebtnApagarEquipo.setGeometry(QtCore.QRect(441, 447, 304, 108))
-        self.framebtnApagarEquipo.setStyleSheet("background-color: rgb(255, 255, 255);\n"
+        self.framebtnApagarEquipo.setGeometry(QtCore.QRect(460, 430, 300, 100))
+        self.framebtnApagarEquipo.setStyleSheet("#framebtnApagarEquipo{\n"
+"background-color: rgb(255, 255, 255);\n"
 "background-color: rgba(255, 255, 255, 200);\n"
 "border-radius: 10px;\n"
-"border: none;")
+"border: none;\n"
+"}")
         self.framebtnApagarEquipo.setFrameShape(QtWidgets.QFrame.StyledPanel)
         self.framebtnApagarEquipo.setFrameShadow(QtWidgets.QFrame.Raised)
         self.framebtnApagarEquipo.setObjectName("framebtnApagarEquipo")
-        self.btnApagarEquipo = QtWidgets.QPushButton(self.framebtnApagarEquipo)
-        self.btnApagarEquipo.setGeometry(QtCore.QRect(2, 2, 301, 71))
-        font = QtGui.QFont()
-        font.setFamily("Poppins")
-        font.setPointSize(12)
-        font.setBold(True)
-        font.setWeight(75)
-        self.btnApagarEquipo.setFont(font)
-        self.btnApagarEquipo.setStyleSheet("QPushButton{\n"
-"    color: rgb(255, 255, 255);\n"
-"    border:none;\n"
-"}\n"
-"QPushButton:hover{\n"
-"    background-color: #FF4C4C;\n"
-"}\n"
-"QPushButton:pressed{\n"
-"    background-color: #D90000;\n"
-"}")
-        self.btnApagarEquipo.setText("")
-        self.btnApagarEquipo.setObjectName("btnApagarEquipo")
         self.lblPresionarApagar = QtWidgets.QLabel(self.framebtnApagarEquipo)
-        self.lblPresionarApagar.setGeometry(QtCore.QRect(0, 75, 301, 31))
+        self.lblPresionarApagar.setGeometry(QtCore.QRect(2, 66, 296, 32))
         font = QtGui.QFont()
         font.setFamily("Poppins")
         font.setPointSize(12)
@@ -206,60 +178,52 @@ class Ui_Modal_Inicio(object):
         font.setWeight(75)
         self.lblPresionarApagar.setFont(font)
         self.lblPresionarApagar.setLayoutDirection(QtCore.Qt.LeftToRight)
-        self.lblPresionarApagar.setStyleSheet("color: rgb(0, 0, 0);")
+        self.lblPresionarApagar.setStyleSheet("color: rgb(0, 0, 0);\n"
+"background-color: rgb(255, 255, 255);\n"
+"border-bottom-left-radius: 10px;\n"
+"border-bottom-right-radius: 10px;")
         self.lblPresionarApagar.setAlignment(QtCore.Qt.AlignCenter)
         self.lblPresionarApagar.setObjectName("lblPresionarApagar")
         self.lblImgApagar = QtWidgets.QLabel(self.framebtnApagarEquipo)
-        self.lblImgApagar.setGeometry(QtCore.QRect(50, 16, 61, 41))
+        self.lblImgApagar.setGeometry(QtCore.QRect(70, 15, 35, 35))
         self.lblImgApagar.setStyleSheet("background-color: transparent;")
         self.lblImgApagar.setText("")
+        self.lblImgApagar.setScaledContents(True)
         self.lblImgApagar.setObjectName("lblImgApagar")
-        self.lblApagar = QtWidgets.QLabel(self.framebtnApagarEquipo)
-        self.lblApagar.setGeometry(QtCore.QRect(2, 2, 301, 71))
+        self.lblFrmApagar = QtWidgets.QLabel(self.framebtnApagarEquipo)
+        self.lblFrmApagar.setGeometry(QtCore.QRect(2, 2, 296, 64))
         font = QtGui.QFont()
         font.setFamily("Poppins")
         font.setPointSize(14)
         font.setBold(True)
         font.setWeight(75)
-        self.lblApagar.setFont(font)
-        self.lblApagar.setLayoutDirection(QtCore.Qt.LeftToRight)
-        self.lblApagar.setAutoFillBackground(False)
-        self.lblApagar.setStyleSheet("background-color: #FF0000;\n"
+        self.lblFrmApagar.setFont(font)
+        self.lblFrmApagar.setLayoutDirection(QtCore.Qt.LeftToRight)
+        self.lblFrmApagar.setAutoFillBackground(False)
+        self.lblFrmApagar.setStyleSheet("background-color: #FF0000;\n"
 "color: rgb(255, 255, 255);\n"
 "border: none;\n"
-"border-radius: 10px;\n"
+"border-top-left-radius: 10px;\n"
+"border-top-right-radius: 10px;\n"
 "padding-left: 30px;")
-        self.lblApagar.setAlignment(QtCore.Qt.AlignCenter)
-        self.lblApagar.setObjectName("lblApagar")
-        self.btnApagarEquipo.raise_()
+        self.lblFrmApagar.setAlignment(QtCore.Qt.AlignCenter)
+        self.lblFrmApagar.setObjectName("lblFrmApagar")
         self.lblPresionarApagar.raise_()
-        self.lblApagar.raise_()
+        self.lblFrmApagar.raise_()
         self.lblImgApagar.raise_()
         self.frameBtnTalloSolo = QtWidgets.QFrame(self.frame)
-        self.frameBtnTalloSolo.setGeometry(QtCore.QRect(75, 51, 304, 108))
-        self.frameBtnTalloSolo.setStyleSheet("background-color: rgb(255, 255, 255);\n"
+        self.frameBtnTalloSolo.setGeometry(QtCore.QRect(80, 70, 300, 100))
+        self.frameBtnTalloSolo.setStyleSheet("#frameBtnTalloSolo{\n"
+"background-color: rgb(255, 255, 255);\n"
 "background-color: rgba(255, 255, 255, 200);\n"
 "border-radius: 10px;\n"
-"border: none;")
+"border: none;\n"
+"}")
         self.frameBtnTalloSolo.setFrameShape(QtWidgets.QFrame.StyledPanel)
         self.frameBtnTalloSolo.setFrameShadow(QtWidgets.QFrame.Raised)
         self.frameBtnTalloSolo.setObjectName("frameBtnTalloSolo")
-        self.btnTalloSolo = QtWidgets.QPushButton(self.frameBtnTalloSolo)
-        self.btnTalloSolo.setGeometry(QtCore.QRect(2, 3, 301, 71))
-        font = QtGui.QFont()
-        font.setFamily("Poppins")
-        font.setPointSize(12)
-        font.setBold(True)
-        font.setWeight(75)
-        self.btnTalloSolo.setFont(font)
-        self.btnTalloSolo.setLayoutDirection(QtCore.Qt.LeftToRight)
-        self.btnTalloSolo.setStyleSheet("background-color: transparent;\n"
-"color: rgb(0, 0, 0);\n"
-"border: none;")
-        self.btnTalloSolo.setText("")
-        self.btnTalloSolo.setObjectName("btnTalloSolo")
         self.lblPresionarTalloSolo = QtWidgets.QLabel(self.frameBtnTalloSolo)
-        self.lblPresionarTalloSolo.setGeometry(QtCore.QRect(0, 75, 301, 31))
+        self.lblPresionarTalloSolo.setGeometry(QtCore.QRect(2, 66, 296, 32))
         font = QtGui.QFont()
         font.setFamily("Poppins")
         font.setPointSize(12)
@@ -267,16 +231,20 @@ class Ui_Modal_Inicio(object):
         font.setWeight(75)
         self.lblPresionarTalloSolo.setFont(font)
         self.lblPresionarTalloSolo.setLayoutDirection(QtCore.Qt.LeftToRight)
-        self.lblPresionarTalloSolo.setStyleSheet("color: rgb(0, 0, 0);")
+        self.lblPresionarTalloSolo.setStyleSheet("color: rgb(0, 0, 0);\n"
+"background-color: rgb(255, 255, 255);\n"
+"border-bottom-left-radius: 10px;\n"
+"border-bottom-right-radius: 10px;")
         self.lblPresionarTalloSolo.setAlignment(QtCore.Qt.AlignCenter)
         self.lblPresionarTalloSolo.setObjectName("lblPresionarTalloSolo")
         self.lblImgTalloSolo = QtWidgets.QLabel(self.frameBtnTalloSolo)
-        self.lblImgTalloSolo.setGeometry(QtCore.QRect(25, 17, 61, 41))
+        self.lblImgTalloSolo.setGeometry(QtCore.QRect(25, 15, 60, 35))
         self.lblImgTalloSolo.setStyleSheet("background-color: transparent;")
         self.lblImgTalloSolo.setText("")
+        self.lblImgTalloSolo.setScaledContents(True)
         self.lblImgTalloSolo.setObjectName("lblImgTalloSolo")
         self.lblTalloSolo = QtWidgets.QLabel(self.frameBtnTalloSolo)
-        self.lblTalloSolo.setGeometry(QtCore.QRect(2, 3, 301, 71))
+        self.lblTalloSolo.setGeometry(QtCore.QRect(2, 2, 296, 64))
         font = QtGui.QFont()
         font.setFamily("Poppins")
         font.setPointSize(14)
@@ -288,48 +256,27 @@ class Ui_Modal_Inicio(object):
         self.lblTalloSolo.setStyleSheet("background-color: rgb(255, 207, 11);\n"
 "color: rgb(0, 0, 0);\n"
 "border: none;\n"
-"border-radius: 10px;\n"
+"border-top-left-radius: 10px;\n"
+"border-top-right-radius: 10px;\n"
 "padding-left: 40px;")
         self.lblTalloSolo.setAlignment(QtCore.Qt.AlignCenter)
         self.lblTalloSolo.setObjectName("lblTalloSolo")
-        self.btnTalloSolo.raise_()
         self.lblPresionarTalloSolo.raise_()
         self.lblTalloSolo.raise_()
         self.lblImgTalloSolo.raise_()
         self.frameBtnTalloCoral = QtWidgets.QFrame(self.frame)
-        self.frameBtnTalloCoral.setGeometry(QtCore.QRect(441, 51, 304, 108))
-        self.frameBtnTalloCoral.setStyleSheet("background-color: rgb(255, 255, 255);\n"
+        self.frameBtnTalloCoral.setGeometry(QtCore.QRect(460, 70, 300, 100))
+        self.frameBtnTalloCoral.setStyleSheet("#frameBtnTalloCoral{\n"
+"background-color: rgb(255, 255, 255);\n"
 "background-color: rgba(255, 255, 255, 200);\n"
 "border-radius: 10px;\n"
-"border: none;")
+"border: none;\n"
+"}")
         self.frameBtnTalloCoral.setFrameShape(QtWidgets.QFrame.StyledPanel)
         self.frameBtnTalloCoral.setFrameShadow(QtWidgets.QFrame.Raised)
         self.frameBtnTalloCoral.setObjectName("frameBtnTalloCoral")
-        self.btnTalloCoral = QtWidgets.QPushButton(self.frameBtnTalloCoral)
-        self.btnTalloCoral.setGeometry(QtCore.QRect(2, 2, 301, 71))
-        font = QtGui.QFont()
-        font.setFamily("Poppins")
-        font.setPointSize(12)
-        font.setBold(True)
-        font.setWeight(75)
-        self.btnTalloCoral.setFont(font)
-        self.btnTalloCoral.setStyleSheet("QPushButton {\n"
-"    background-color: transparent;\n"
-"    color: rgb(0, 0, 0);\n"
-"    border: none;\n"
-"}\n"
-"\n"
-"QPushButton:hover {\n"
-"    background-color: rgb(255, 207, 11);\n"
-"}\n"
-"\n"
-"QPushButton:pressed {\n"
-"    background-color: rgb(255, 207, 11);\n"
-"}")
-        self.btnTalloCoral.setText("")
-        self.btnTalloCoral.setObjectName("btnTalloCoral")
         self.lblPresionarTalloCoral = QtWidgets.QLabel(self.frameBtnTalloCoral)
-        self.lblPresionarTalloCoral.setGeometry(QtCore.QRect(0, 75, 301, 31))
+        self.lblPresionarTalloCoral.setGeometry(QtCore.QRect(2, 66, 296, 32))
         font = QtGui.QFont()
         font.setFamily("Poppins")
         font.setPointSize(12)
@@ -337,16 +284,20 @@ class Ui_Modal_Inicio(object):
         font.setWeight(75)
         self.lblPresionarTalloCoral.setFont(font)
         self.lblPresionarTalloCoral.setLayoutDirection(QtCore.Qt.LeftToRight)
-        self.lblPresionarTalloCoral.setStyleSheet("color: rgb(0, 0, 0);")
+        self.lblPresionarTalloCoral.setStyleSheet("color: rgb(0, 0, 0);\n"
+"background-color: rgb(255, 255, 255);\n"
+"border-bottom-left-radius: 10px;\n"
+"border-bottom-right-radius: 10px;")
         self.lblPresionarTalloCoral.setAlignment(QtCore.Qt.AlignCenter)
         self.lblPresionarTalloCoral.setObjectName("lblPresionarTalloCoral")
         self.lblImgTalloCoral = QtWidgets.QLabel(self.frameBtnTalloCoral)
-        self.lblImgTalloCoral.setGeometry(QtCore.QRect(25, 20, 61, 41))
+        self.lblImgTalloCoral.setGeometry(QtCore.QRect(25, 15, 60, 35))
         self.lblImgTalloCoral.setStyleSheet("background-color: transparent;")
         self.lblImgTalloCoral.setText("")
+        self.lblImgTalloCoral.setScaledContents(True)
         self.lblImgTalloCoral.setObjectName("lblImgTalloCoral")
         self.lblTalloCoral = QtWidgets.QLabel(self.frameBtnTalloCoral)
-        self.lblTalloCoral.setGeometry(QtCore.QRect(2, 2, 301, 71))
+        self.lblTalloCoral.setGeometry(QtCore.QRect(2, 2, 296, 64))
         font = QtGui.QFont()
         font.setFamily("Poppins")
         font.setPointSize(14)
@@ -358,48 +309,28 @@ class Ui_Modal_Inicio(object):
         self.lblTalloCoral.setStyleSheet("background-color: rgb(255, 207, 11);\n"
 "color: rgb(0, 0, 0);\n"
 "border: none;\n"
-"border-radius: 10px;\n"
+"border-top-left-radius: 10px;\n"
+"border-top-right-radius: 10px;\n"
 "padding-left: 55px;")
+        self.lblTalloCoral.setScaledContents(True)
         self.lblTalloCoral.setAlignment(QtCore.Qt.AlignCenter)
         self.lblTalloCoral.setObjectName("lblTalloCoral")
-        self.btnTalloCoral.raise_()
         self.lblPresionarTalloCoral.raise_()
         self.lblTalloCoral.raise_()
         self.lblImgTalloCoral.raise_()
         self.frameBtnMediaValvaTS = QtWidgets.QFrame(self.frame)
-        self.frameBtnMediaValvaTS.setGeometry(QtCore.QRect(793, 51, 304, 108))
-        self.frameBtnMediaValvaTS.setStyleSheet("background-color: rgb(255, 255, 255);\n"
+        self.frameBtnMediaValvaTS.setGeometry(QtCore.QRect(840, 70, 300, 100))
+        self.frameBtnMediaValvaTS.setStyleSheet("#frameBtnMediaValvaTS{\n"
+"background-color: rgb(255, 255, 255);\n"
 "background-color: rgba(255, 255, 255, 200);\n"
 "border-radius: 10px;\n"
-"border: none;")
+"border: none;\n"
+"}")
         self.frameBtnMediaValvaTS.setFrameShape(QtWidgets.QFrame.StyledPanel)
         self.frameBtnMediaValvaTS.setFrameShadow(QtWidgets.QFrame.Raised)
         self.frameBtnMediaValvaTS.setObjectName("frameBtnMediaValvaTS")
-        self.btnMediaValvaTs = QtWidgets.QPushButton(self.frameBtnMediaValvaTS)
-        self.btnMediaValvaTs.setGeometry(QtCore.QRect(2, 2, 301, 71))
-        font = QtGui.QFont()
-        font.setFamily("Poppins")
-        font.setPointSize(12)
-        font.setBold(True)
-        font.setWeight(75)
-        self.btnMediaValvaTs.setFont(font)
-        self.btnMediaValvaTs.setStyleSheet("QPushButton {\n"
-"    background-color: transparent;\n"
-"    color: rgb(0, 0, 0);\n"
-"    border: none;\n"
-"}\n"
-"\n"
-"QPushButton:hover {\n"
-"    background-color: rgb(255, 207, 11);\n"
-"}\n"
-"\n"
-"QPushButton:pressed {\n"
-"    background-color: rgb(255, 207, 11);\n"
-"}")
-        self.btnMediaValvaTs.setText("")
-        self.btnMediaValvaTs.setObjectName("btnMediaValvaTs")
         self.lblPresionarMediaValvaTs = QtWidgets.QLabel(self.frameBtnMediaValvaTS)
-        self.lblPresionarMediaValvaTs.setGeometry(QtCore.QRect(0, 75, 301, 31))
+        self.lblPresionarMediaValvaTs.setGeometry(QtCore.QRect(2, 66, 296, 32))
         font = QtGui.QFont()
         font.setFamily("Poppins")
         font.setPointSize(12)
@@ -407,16 +338,20 @@ class Ui_Modal_Inicio(object):
         font.setWeight(75)
         self.lblPresionarMediaValvaTs.setFont(font)
         self.lblPresionarMediaValvaTs.setLayoutDirection(QtCore.Qt.LeftToRight)
-        self.lblPresionarMediaValvaTs.setStyleSheet("color: rgb(0, 0, 0);")
+        self.lblPresionarMediaValvaTs.setStyleSheet("color: rgb(0, 0, 0);\n"
+"background-color: rgb(255, 255, 255);\n"
+"border-bottom-left-radius: 10px;\n"
+"border-bottom-right-radius: 10px;")
         self.lblPresionarMediaValvaTs.setAlignment(QtCore.Qt.AlignCenter)
         self.lblPresionarMediaValvaTs.setObjectName("lblPresionarMediaValvaTs")
         self.lblImgMediaValvaTs = QtWidgets.QLabel(self.frameBtnMediaValvaTS)
-        self.lblImgMediaValvaTs.setGeometry(QtCore.QRect(25, 18, 61, 41))
+        self.lblImgMediaValvaTs.setGeometry(QtCore.QRect(30, 15, 35, 35))
         self.lblImgMediaValvaTs.setStyleSheet("background-color: transparent;")
         self.lblImgMediaValvaTs.setText("")
+        self.lblImgMediaValvaTs.setScaledContents(True)
         self.lblImgMediaValvaTs.setObjectName("lblImgMediaValvaTs")
         self.lblMediaValvaTs = QtWidgets.QLabel(self.frameBtnMediaValvaTS)
-        self.lblMediaValvaTs.setGeometry(QtCore.QRect(2, 2, 301, 71))
+        self.lblMediaValvaTs.setGeometry(QtCore.QRect(2, 2, 296, 64))
         font = QtGui.QFont()
         font.setFamily("Poppins")
         font.setPointSize(14)
@@ -428,48 +363,27 @@ class Ui_Modal_Inicio(object):
         self.lblMediaValvaTs.setStyleSheet("background-color: rgb(255, 207, 11);\n"
 "color: rgb(0, 0, 0);\n"
 "border: none;\n"
-"border-radius: 10px;\n"
+"border-top-left-radius: 10px;\n"
+"border-top-right-radius: 10px;\n"
 "padding-left: 50px;")
         self.lblMediaValvaTs.setAlignment(QtCore.Qt.AlignCenter)
         self.lblMediaValvaTs.setObjectName("lblMediaValvaTs")
-        self.btnMediaValvaTs.raise_()
         self.lblPresionarMediaValvaTs.raise_()
         self.lblMediaValvaTs.raise_()
         self.lblImgMediaValvaTs.raise_()
         self.frameBtnMediaValvaTc = QtWidgets.QFrame(self.frame)
-        self.frameBtnMediaValvaTc.setGeometry(QtCore.QRect(227, 215, 304, 108))
-        self.frameBtnMediaValvaTc.setStyleSheet("background-color: rgb(255, 255, 255);\n"
+        self.frameBtnMediaValvaTc.setGeometry(QtCore.QRect(270, 220, 300, 100))
+        self.frameBtnMediaValvaTc.setStyleSheet("#frameBtnMediaValvaTc{\n"
+"background-color: rgb(255, 255, 255);\n"
 "background-color: rgba(255, 255, 255, 200);\n"
 "border-radius: 10px;\n"
-"border: none;")
+"border: none;\n"
+"}")
         self.frameBtnMediaValvaTc.setFrameShape(QtWidgets.QFrame.StyledPanel)
         self.frameBtnMediaValvaTc.setFrameShadow(QtWidgets.QFrame.Raised)
         self.frameBtnMediaValvaTc.setObjectName("frameBtnMediaValvaTc")
-        self.btnMediaValvaTc = QtWidgets.QPushButton(self.frameBtnMediaValvaTc)
-        self.btnMediaValvaTc.setGeometry(QtCore.QRect(2, 2, 301, 71))
-        font = QtGui.QFont()
-        font.setFamily("Poppins")
-        font.setPointSize(12)
-        font.setBold(True)
-        font.setWeight(75)
-        self.btnMediaValvaTc.setFont(font)
-        self.btnMediaValvaTc.setStyleSheet("QPushButton {\n"
-"    background-color: transparent;\n"
-"    color: rgb(0, 0, 0);\n"
-"    border: none;\n"
-"}\n"
-"\n"
-"QPushButton:hover {\n"
-"    background-color: rgb(255, 207, 11);\n"
-"}\n"
-"\n"
-"QPushButton:pressed {\n"
-"    background-color: rgb(255, 207, 11);\n"
-"}")
-        self.btnMediaValvaTc.setText("")
-        self.btnMediaValvaTc.setObjectName("btnMediaValvaTc")
         self.lblPresionarMediaValvaTc = QtWidgets.QLabel(self.frameBtnMediaValvaTc)
-        self.lblPresionarMediaValvaTc.setGeometry(QtCore.QRect(0, 75, 301, 31))
+        self.lblPresionarMediaValvaTc.setGeometry(QtCore.QRect(2, 66, 296, 32))
         font = QtGui.QFont()
         font.setFamily("Poppins")
         font.setPointSize(12)
@@ -477,17 +391,21 @@ class Ui_Modal_Inicio(object):
         font.setWeight(75)
         self.lblPresionarMediaValvaTc.setFont(font)
         self.lblPresionarMediaValvaTc.setLayoutDirection(QtCore.Qt.LeftToRight)
-        self.lblPresionarMediaValvaTc.setStyleSheet("color: rgb(0, 0, 0);")
+        self.lblPresionarMediaValvaTc.setStyleSheet("color: rgb(0, 0, 0);\n"
+"background-color: rgb(255, 255, 255);\n"
+"border-bottom-left-radius: 10px;\n"
+"border-bottom-right-radius: 10px;")
         self.lblPresionarMediaValvaTc.setAlignment(QtCore.Qt.AlignCenter)
         self.lblPresionarMediaValvaTc.setObjectName("lblPresionarMediaValvaTc")
         self.lblImgMediaValvaTc = QtWidgets.QLabel(self.frameBtnMediaValvaTc)
-        self.lblImgMediaValvaTc.setGeometry(QtCore.QRect(25, 18, 61, 41))
+        self.lblImgMediaValvaTc.setGeometry(QtCore.QRect(25, 15, 35, 35))
         self.lblImgMediaValvaTc.setStyleSheet("background-color: transparent;")
         self.lblImgMediaValvaTc.setText("")
+        self.lblImgMediaValvaTc.setScaledContents(True)
         self.lblImgMediaValvaTc.setAlignment(QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft|QtCore.Qt.AlignVCenter)
         self.lblImgMediaValvaTc.setObjectName("lblImgMediaValvaTc")
         self.lblMediaValvaTc = QtWidgets.QLabel(self.frameBtnMediaValvaTc)
-        self.lblMediaValvaTc.setGeometry(QtCore.QRect(2, 2, 301, 71))
+        self.lblMediaValvaTc.setGeometry(QtCore.QRect(2, 2, 296, 64))
         font = QtGui.QFont()
         font.setFamily("Poppins")
         font.setPointSize(14)
@@ -499,48 +417,27 @@ class Ui_Modal_Inicio(object):
         self.lblMediaValvaTc.setStyleSheet("background-color: rgb(255, 207, 11);\n"
 "color: rgb(0, 0, 0);\n"
 "border: none;\n"
-"border-radius: 10px;\n"
+"border-top-left-radius: 10px;\n"
+"border-top-right-radius: 10px;\n"
 "padding-left: 50px;")
         self.lblMediaValvaTc.setAlignment(QtCore.Qt.AlignCenter)
         self.lblMediaValvaTc.setObjectName("lblMediaValvaTc")
-        self.btnMediaValvaTc.raise_()
         self.lblPresionarMediaValvaTc.raise_()
         self.lblMediaValvaTc.raise_()
         self.lblImgMediaValvaTc.raise_()
         self.frameBtnOtros = QtWidgets.QFrame(self.frame)
-        self.frameBtnOtros.setGeometry(QtCore.QRect(641, 215, 304, 108))
-        self.frameBtnOtros.setStyleSheet("background-color: rgb(255, 255, 255);\n"
+        self.frameBtnOtros.setGeometry(QtCore.QRect(650, 220, 300, 100))
+        self.frameBtnOtros.setStyleSheet("#frameBtnOtros{\n"
+"background-color: rgb(255, 255, 255);\n"
 "background-color: rgba(255, 255, 255, 200);\n"
 "border-radius: 10px;\n"
-"border: none;")
+"border: none;\n"
+"}")
         self.frameBtnOtros.setFrameShape(QtWidgets.QFrame.StyledPanel)
         self.frameBtnOtros.setFrameShadow(QtWidgets.QFrame.Raised)
         self.frameBtnOtros.setObjectName("frameBtnOtros")
-        self.btnOtros = QtWidgets.QPushButton(self.frameBtnOtros)
-        self.btnOtros.setGeometry(QtCore.QRect(2, 2, 301, 71))
-        font = QtGui.QFont()
-        font.setFamily("Poppins")
-        font.setPointSize(12)
-        font.setBold(True)
-        font.setWeight(75)
-        self.btnOtros.setFont(font)
-        self.btnOtros.setStyleSheet("QPushButton {\n"
-"    background-color: transparent;\n"
-"    color: rgb(0, 0, 0);\n"
-"    border: none;\n"
-"}\n"
-"\n"
-"QPushButton:hover {\n"
-"    background-color: rgb(255, 207, 11);\n"
-"}\n"
-"\n"
-"QPushButton:pressed {\n"
-"    background-color: rgb(255, 207, 11);\n"
-"}")
-        self.btnOtros.setText("")
-        self.btnOtros.setObjectName("btnOtros")
         self.lblPresionarOtros = QtWidgets.QLabel(self.frameBtnOtros)
-        self.lblPresionarOtros.setGeometry(QtCore.QRect(0, 75, 301, 31))
+        self.lblPresionarOtros.setGeometry(QtCore.QRect(2, 66, 296, 32))
         font = QtGui.QFont()
         font.setFamily("Poppins")
         font.setPointSize(12)
@@ -548,16 +445,20 @@ class Ui_Modal_Inicio(object):
         font.setWeight(75)
         self.lblPresionarOtros.setFont(font)
         self.lblPresionarOtros.setLayoutDirection(QtCore.Qt.LeftToRight)
-        self.lblPresionarOtros.setStyleSheet("color: rgb(0, 0, 0);")
+        self.lblPresionarOtros.setStyleSheet("color: rgb(0, 0, 0);\n"
+"background-color: rgb(255, 255, 255);\n"
+"border-bottom-left-radius: 10px;\n"
+"border-bottom-right-radius: 10px;")
         self.lblPresionarOtros.setAlignment(QtCore.Qt.AlignCenter)
         self.lblPresionarOtros.setObjectName("lblPresionarOtros")
         self.lblImgOtros = QtWidgets.QLabel(self.frameBtnOtros)
-        self.lblImgOtros.setGeometry(QtCore.QRect(60, 18, 61, 41))
+        self.lblImgOtros.setGeometry(QtCore.QRect(80, 15, 35, 35))
         self.lblImgOtros.setStyleSheet("background-color: transparent;")
         self.lblImgOtros.setText("")
+        self.lblImgOtros.setScaledContents(True)
         self.lblImgOtros.setObjectName("lblImgOtros")
         self.lblOtros = QtWidgets.QLabel(self.frameBtnOtros)
-        self.lblOtros.setGeometry(QtCore.QRect(2, 2, 301, 71))
+        self.lblOtros.setGeometry(QtCore.QRect(2, 2, 296, 64))
         font = QtGui.QFont()
         font.setFamily("Poppins")
         font.setPointSize(14)
@@ -569,11 +470,11 @@ class Ui_Modal_Inicio(object):
         self.lblOtros.setStyleSheet("background-color: rgb(255, 207, 11);\n"
 "color: rgb(0, 0, 0);\n"
 "border: none;\n"
-"border-radius: 10px;\n"
+"border-top-left-radius: 10px;\n"
+"border-top-right-radius: 10px;\n"
 "padding-left: 30px;")
         self.lblOtros.setAlignment(QtCore.Qt.AlignCenter)
         self.lblOtros.setObjectName("lblOtros")
-        self.btnOtros.raise_()
         self.lblPresionarOtros.raise_()
         self.lblOtros.raise_()
         self.lblImgOtros.raise_()
@@ -590,9 +491,159 @@ class Ui_Modal_Inicio(object):
         self.frameFondoSistema.setFrameShape(QtWidgets.QFrame.StyledPanel)
         self.frameFondoSistema.setFrameShadow(QtWidgets.QFrame.Raised)
         self.frameFondoSistema.setObjectName("frameFondoSistema")
+        self.frmSombra = QtWidgets.QFrame(self.centralwidget)
+        self.frmSombra.setGeometry(QtCore.QRect(0, 0, 1600, 900))
+        self.frmSombra.setStyleSheet("#frmSombra{\n"
+"background-color: rgba(0, 0, 0, 80);\n"
+"}")
+        self.frmSombra.setFrameShape(QtWidgets.QFrame.StyledPanel)
+        self.frmSombra.setFrameShadow(QtWidgets.QFrame.Raised)
+        self.frmSombra.setObjectName("frmSombra")
+        self.frmFinalizarAlerta = QtWidgets.QFrame(self.frmSombra)
+        self.frmFinalizarAlerta.setGeometry(QtCore.QRect(450, 297, 700, 305))
+        self.frmFinalizarAlerta.setStyleSheet("#frmFinalizarAlerta{background-color: rgb(255, 255, 255);\n"
+"color: rgb(0, 0, 0);\n"
+"border:none;\n"
+"border-radius: 10px;\n"
+"border: 2px solid #D9D9D9;}")
+        self.frmFinalizarAlerta.setFrameShape(QtWidgets.QFrame.StyledPanel)
+        self.frmFinalizarAlerta.setFrameShadow(QtWidgets.QFrame.Raised)
+        self.frmFinalizarAlerta.setObjectName("frmFinalizarAlerta")
+        self.lblTituloFinalizar = QtWidgets.QLabel(self.frmFinalizarAlerta)
+        self.lblTituloFinalizar.setGeometry(QtCore.QRect(2, 2, 696, 50))
+        font = QtGui.QFont()
+        font.setFamily("Poppins")
+        font.setPointSize(18)
+        font.setBold(True)
+        font.setWeight(75)
+        self.lblTituloFinalizar.setFont(font)
+        self.lblTituloFinalizar.setStyleSheet("background-color: rgb(29, 71, 131);\n"
+"color: rgb(255, 255, 255);\n"
+"border-top-left-radius: 10px;\n"
+"border-top-right-radius: 10px;")
+        self.lblTituloFinalizar.setAlignment(QtCore.Qt.AlignCenter)
+        self.lblTituloFinalizar.setObjectName("lblTituloFinalizar")
+        self.imgFinalizar = QtWidgets.QLabel(self.frmFinalizarAlerta)
+        self.imgFinalizar.setGeometry(QtCore.QRect(100, 80, 100, 100))
+        self.imgFinalizar.setText("")
+        self.imgFinalizar.setScaledContents(True)
+        self.imgFinalizar.setObjectName("imgFinalizar")
+        self.lblTextoFinalizar = QtWidgets.QLabel(self.frmFinalizarAlerta)
+        self.lblTextoFinalizar.setGeometry(QtCore.QRect(200, 105, 400, 50))
+        font = QtGui.QFont()
+        font.setFamily("Poppins")
+        font.setPointSize(14)
+        font.setBold(True)
+        font.setWeight(75)
+        self.lblTextoFinalizar.setFont(font)
+        self.lblTextoFinalizar.setAlignment(QtCore.Qt.AlignCenter)
+        self.lblTextoFinalizar.setObjectName("lblTextoFinalizar")
+        self.frmBtnApagar = QtWidgets.QFrame(self.frmFinalizarAlerta)
+        self.frmBtnApagar.setGeometry(QtCore.QRect(30, 210, 200, 70))
+        self.frmBtnApagar.setStyleSheet("#frmBtnApagar{\n"
+"background-color: rgb(255, 255, 255);\n"
+"border-radius: 10px;\n"
+"border: 2px solid #bbbbbb;\n"
+"}")
+        self.frmBtnApagar.setFrameShape(QtWidgets.QFrame.StyledPanel)
+        self.frmBtnApagar.setFrameShadow(QtWidgets.QFrame.Raised)
+        self.frmBtnApagar.setObjectName("frmBtnApagar")
+        self.lblPresione1Apagar = QtWidgets.QLabel(self.frmBtnApagar)
+        self.lblPresione1Apagar.setGeometry(QtCore.QRect(0, 40, 200, 30))
+        font = QtGui.QFont()
+        font.setFamily("Poppins")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        self.lblPresione1Apagar.setFont(font)
+        self.lblPresione1Apagar.setAlignment(QtCore.Qt.AlignCenter)
+        self.lblPresione1Apagar.setObjectName("lblPresione1Apagar")
+        self.lblApagar = QtWidgets.QLabel(self.frmBtnApagar)
+        self.lblApagar.setGeometry(QtCore.QRect(2, 2, 196, 38))
+        font = QtGui.QFont()
+        font.setFamily("Poppins")
+        font.setPointSize(12)
+        font.setBold(True)
+        font.setWeight(75)
+        self.lblApagar.setFont(font)
+        self.lblApagar.setStyleSheet("color: rgb(255, 255, 255);\n"
+"border-top-left-radius: 10px;\n"
+"border-top-right-radius: 10px;\n"
+"background-color: rgb(85, 170, 0);")
+        self.lblApagar.setAlignment(QtCore.Qt.AlignCenter)
+        self.lblApagar.setObjectName("lblApagar")
+        self.frmBtnReiniciar = QtWidgets.QFrame(self.frmFinalizarAlerta)
+        self.frmBtnReiniciar.setGeometry(QtCore.QRect(250, 210, 200, 70))
+        self.frmBtnReiniciar.setStyleSheet("#frmBtnReiniciar{\n"
+"background-color: rgb(255, 255, 255);\n"
+"border-radius: 10px;\n"
+"border: 2px solid #bbbbbb;\n"
+"}")
+        self.frmBtnReiniciar.setFrameShape(QtWidgets.QFrame.StyledPanel)
+        self.frmBtnReiniciar.setFrameShadow(QtWidgets.QFrame.Raised)
+        self.frmBtnReiniciar.setObjectName("frmBtnReiniciar")
+        self.lblPresione2Apagar = QtWidgets.QLabel(self.frmBtnReiniciar)
+        self.lblPresione2Apagar.setGeometry(QtCore.QRect(0, 40, 200, 30))
+        font = QtGui.QFont()
+        font.setFamily("Poppins")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        self.lblPresione2Apagar.setFont(font)
+        self.lblPresione2Apagar.setAlignment(QtCore.Qt.AlignCenter)
+        self.lblPresione2Apagar.setObjectName("lblPresione2Apagar")
+        self.lblReiniciar = QtWidgets.QLabel(self.frmBtnReiniciar)
+        self.lblReiniciar.setGeometry(QtCore.QRect(2, 2, 196, 38))
+        font = QtGui.QFont()
+        font.setFamily("Poppins")
+        font.setPointSize(12)
+        font.setBold(True)
+        font.setWeight(75)
+        self.lblReiniciar.setFont(font)
+        self.lblReiniciar.setStyleSheet("color: rgb(255, 255, 255);\n"
+"border-top-left-radius: 10px;\n"
+"border-top-right-radius: 10px;\n"
+"background-color: #0055FF;")
+        self.lblReiniciar.setAlignment(QtCore.Qt.AlignCenter)
+        self.lblReiniciar.setObjectName("lblReiniciar")
+        self.frmBtnApagarCancelar = QtWidgets.QFrame(self.frmFinalizarAlerta)
+        self.frmBtnApagarCancelar.setGeometry(QtCore.QRect(470, 210, 200, 70))
+        self.frmBtnApagarCancelar.setStyleSheet("#frmBtnApagarCancelar{\n"
+"background-color: rgb(255, 255, 255);\n"
+"border-radius: 10px;\n"
+"border: 2px solid #bbbbbb;\n"
+"}")
+        self.frmBtnApagarCancelar.setFrameShape(QtWidgets.QFrame.StyledPanel)
+        self.frmBtnApagarCancelar.setFrameShadow(QtWidgets.QFrame.Raised)
+        self.frmBtnApagarCancelar.setObjectName("frmBtnApagarCancelar")
+        self.lblPresione3Apagar = QtWidgets.QLabel(self.frmBtnApagarCancelar)
+        self.lblPresione3Apagar.setGeometry(QtCore.QRect(0, 40, 200, 30))
+        font = QtGui.QFont()
+        font.setFamily("Poppins")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        self.lblPresione3Apagar.setFont(font)
+        self.lblPresione3Apagar.setAlignment(QtCore.Qt.AlignCenter)
+        self.lblPresione3Apagar.setObjectName("lblPresione3Apagar")
+        self.lblCancelarApagar = QtWidgets.QLabel(self.frmBtnApagarCancelar)
+        self.lblCancelarApagar.setGeometry(QtCore.QRect(2, 2, 196, 38))
+        font = QtGui.QFont()
+        font.setFamily("Poppins")
+        font.setPointSize(12)
+        font.setBold(True)
+        font.setWeight(75)
+        self.lblCancelarApagar.setFont(font)
+        self.lblCancelarApagar.setStyleSheet("color: rgb(255, 255, 255);\n"
+"border-top-left-radius: 10px;\n"
+"border-top-right-radius: 10px;\n"
+"background-color: rgb(255, 0, 0);")
+        self.lblCancelarApagar.setAlignment(QtCore.Qt.AlignCenter)
+        self.lblCancelarApagar.setObjectName("lblCancelarApagar")
         self.labelFondoSistema.raise_()
         self.frameFondoSistema.raise_()
         self.frame.raise_()
+        self.frmSombra.raise_()
         Modal_Inicio.setCentralWidget(self.centralwidget)
 
         self.retranslateUi(Modal_Inicio)
@@ -606,7 +657,7 @@ class Ui_Modal_Inicio(object):
         self.lblPresionarIniciarProceso.setText(_translate("Modal_Inicio", "PRESIONE  (↵)"))
         self.lblIniciarProceso.setText(_translate("Modal_Inicio", "INICIAR PROCESO"))
         self.lblPresionarApagar.setText(_translate("Modal_Inicio", "PRESIONE (0)"))
-        self.lblApagar.setText(_translate("Modal_Inicio", "APAGAR"))
+        self.lblFrmApagar.setText(_translate("Modal_Inicio", "APAGAR"))
         self.lblPresionarTalloSolo.setText(_translate("Modal_Inicio", "PRESIONE (1)"))
         self.lblTalloSolo.setText(_translate("Modal_Inicio", "TALLO SOLO"))
         self.lblPresionarTalloCoral.setText(_translate("Modal_Inicio", "PRESIONE (2)"))
@@ -617,3 +668,11 @@ class Ui_Modal_Inicio(object):
         self.lblMediaValvaTc.setText(_translate("Modal_Inicio", "MEDIA VALVA T/C"))
         self.lblPresionarOtros.setText(_translate("Modal_Inicio", "PRESIONE (5)"))
         self.lblOtros.setText(_translate("Modal_Inicio", "OTROS"))
+        self.lblTituloFinalizar.setText(_translate("Modal_Inicio", ".::: APAGAR EQUIPO :::."))
+        self.lblTextoFinalizar.setText(_translate("Modal_Inicio", "¿QUE OPERACIÓN DESEA REALIZAR?"))
+        self.lblPresione1Apagar.setText(_translate("Modal_Inicio", ".::: PRESIONE 1 :::."))
+        self.lblApagar.setText(_translate("Modal_Inicio", "APAGAR"))
+        self.lblPresione2Apagar.setText(_translate("Modal_Inicio", ".::: PRESIONE 2 :::."))
+        self.lblReiniciar.setText(_translate("Modal_Inicio", "REINICIAR"))
+        self.lblPresione3Apagar.setText(_translate("Modal_Inicio", ".::: PRESIONE 3 :::."))
+        self.lblCancelarApagar.setText(_translate("Modal_Inicio", "CANCELAR"))

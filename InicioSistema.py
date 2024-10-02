@@ -23,6 +23,7 @@ COMARDUINO = ""
 COMINDICADOR = ""
 
 listoParaAccionar = False
+utilizaCamara = ""
 
 captaCodigo = False
 captaCodigoQr = False
@@ -72,6 +73,9 @@ frmEditarPresentacion = False
 frmAlertaDescuentoCodigoUsuario = False
 frmAlertaDescuentoSeleccionaEspecie = False
 frmAlertaDescuentoIngresaPeso = False
+frmAlertaDescuentoCodigoUsuarioServis = False
+frmAlertaDescuentoSeleccionaEspecieServis = False
+frmAlertaDescuentoIngresaPesoServis = False
 
 frmIngresarPasswordAdministradorTara = False
 frmIngresarPasswordAdministradorEditarPesada = False
@@ -81,8 +85,10 @@ presentacionEditarTara = 0
 idPesadaEditarOEliminar = 0
 codigoColaboradorNuevo = 0
 codigoColaboradorDescuento = 0
+codigoColaboradorDescuentoServis = 0
 
 presentacionDescuento = ""
+presentacionDescuentoServis = ""
 
 passwordEliminar = ""
 
@@ -124,9 +130,7 @@ class WorkerThread(QThread):
                     self.update_baliza.emit(result[2:10]) # Yaohua 
                     self.update_estado.emit("1")
             except Exception as e:
-                # print("WT IN: " + str(e))
                 time.sleep(1)
-                # Cerrar la conexión serial si hay una excepción
                 if serialIndicador is not None and serialIndicador.is_open:
                     serialIndicador.close()
     
@@ -137,7 +141,6 @@ class WorkerThread(QThread):
 """ Creamos hilo para la ejecución en segundo plano para subir los datos al servidor """
 
 class WorkerThreadSubirDatosBase(QThread):
-    # Tarea a ejecutarse cada determinado tiempo.
     def run(self):
         while True:
             s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -150,13 +153,16 @@ class WorkerThreadSubirDatosBase(QThread):
                 print("Con conexión a internet")
                 try:
                     self.conexion = DataBase.database_conexion.Conectar()
-                    # self.conexion.actualizar_datos_servidor_pesadas()
+                    self.conexion.db_actualizar_datos_servidor_procesos()
+                    self.conexion.db_actualizar_datos_servidor_lotes()
+                    self.conexion.db_actualizar_datos_servidor_pesadas()
+                    self.conexion.db_actualizar_datos_servidor_descuentos()
                 except Exception as e:
                     print(f"Error al interactuar con la base de datos: {e}")
                     print('ERROR')
                 else:
                     s.close()
-            time.sleep(240)
+            time.sleep(300)
 
 """ Creamos hilo para la ejecución en segundo plano del Arduino, de esta forma
 evitamos que la aplicación se detenga por la lectura constante  """
@@ -194,8 +200,7 @@ class WorkerThreadAR(QThread):
             else:
                 print("No se pudo abrir el puerto Arduino.")
         except serial.SerialException as e:
-            # print("Serial Exception: " + str(e))
-            time.sleep(1)  # Espera antes de intentar reconectar
+            time.sleep(1)
         except Exception as e:
             print("Other Exception: " + str(e))
 
@@ -223,7 +228,6 @@ workerAR.start()  # Inicia el hilo
 evitamos que la aplicación se detenga por la lectura constante """
 
 class WorkerThreadFechaHora(QThread):
-    # Tarea a ejecutarse cada determinado tiempo.
     update_fecha = pyqtSignal(str)
     update_hora = pyqtSignal(str)
     def run(self):
@@ -303,13 +307,18 @@ class AplicacionPrincipal(QMainWindow):
 
             self.pulsosArduino = pulsosArduino
             
-            # self.cap = cv2.VideoCapture(0)
-            # self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, 270)
-            # self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 200)
+            self.fn_asignaUtilizaCamara()
+            
+            if utilizaCamara.upper() == "SI":
+                self.cap = cv2.VideoCapture(0)
+                self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, 270)
+                self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 200)
 
-            # self.timer = QTimer()
-            # self.timer.timeout.connect(self.update_frame)
-            # self.timer.start(30)
+                self.timer = QTimer()
+                self.timer.timeout.connect(self.update_frame)
+                self.timer.start(30)
+            else:
+                self.cap = None
             
             self.setWindowFlag(QtCore.Qt.FramelessWindowHint)
             self.setWindowIcon(QtGui.QIcon("Resources/icon.jpg"))
@@ -340,8 +349,10 @@ class AplicacionPrincipal(QMainWindow):
             self.ui.txtCodigoColaborador.textChanged.connect(self.fn_recepcionaCodigoColaborador)
             self.ui.txtIngresarNuevoCodigoColaborador.textChanged.connect(self.fn_recepcionaCodigoColaboradorNuevo)
             self.ui.txtIngresarCodigoColaboradorDescuento.textChanged.connect(self.fn_recepcionaCodigoColaboradorDescuento)
+            self.ui.txtIngresarCodigoServisDescuento.textChanged.connect(self.fn_recepcionaCodigoServisDescuento)
             self.ui.txtIngresarNuevaTara.textChanged.connect(self.fn_validarEntradaNumerica)
             self.ui.txtIngresarPesoDescuento.textChanged.connect(self.fn_validarEntradaNumericaDecimal)
+            self.ui.txtIngresarPesoDescuentoServis.textChanged.connect(self.fn_validarEntradaNumericaDecimal)
             self.ui.txtNumeroDePesada.textChanged.connect(self.fn_validarEntradaNumerica)
             
             self.ui.imgPanera.setHidden(True)
@@ -362,6 +373,7 @@ class AplicacionPrincipal(QMainWindow):
             self.ui.frmAlertaEditarCodigoUsuario.setHidden(True)
             self.ui.frmEditarPresentacion.setHidden(True)
             self.ui.frmAlertaDescuentoCodigoUsuario.setHidden(True)
+            self.ui.frmAlertaDescuentoServis.setHidden(True)
             self.ui.frmDescuentoAlerta.setHidden(True)
             self.ui.frmSombra.setHidden(True)
             self.ui.frmAlerta.setHidden(True)
@@ -380,34 +392,31 @@ class AplicacionPrincipal(QMainWindow):
             self.tablaDePesos.setColumnHidden(10, True)
         
     def update_frame(self):
-        ret, frame = self.cap.read()
-        if ret:
-            frame = cv2.flip(frame, 1)
-            qr_codes = decode(frame)
+        if self.cap is not None:
+            ret, frame = self.cap.read()
+            if ret:
+                frame = cv2.flip(frame, 1)
+                qr_codes = decode(frame)
 
-            for qr_code in qr_codes:
-                qr_data = qr_code.data.decode('utf-8')
-                
-                if(captaCodigo and captaCodigoQr):
-                    self.ui.txtCodigoColaborador.setText(qr_data)
-                    self.ui.txtCodigoColaborador.setFocus(True)
-                else:
-                    self.ui.txtCodigoColaborador.setText("")
-                
-                (x, y, w, h) = qr_code.rect
-                cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
+                for qr_code in qr_codes:
+                    qr_data = qr_code.data.decode('utf-8')
+                    
+                    if(captaCodigo and captaCodigoQr):
+                        self.ui.txtCodigoColaborador.setText(qr_data)
+                        self.ui.txtCodigoColaborador.setFocus(True)
+                    else:
+                        self.ui.txtCodigoColaborador.setText("")
+                    
+                    (x, y, w, h) = qr_code.rect
+                    cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
 
-            frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-            h, w, ch = frame.shape
-            bytes_per_line = ch * w
-            q_image = QImage(frame.data, w, h, bytes_per_line, QImage.Format_RGB888)
-            q_image = q_image.scaled(self.ui.videoCamaraQr.width(), self.ui.videoCamaraQr.height())
+                frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+                h, w, ch = frame.shape
+                bytes_per_line = ch * w
+                q_image = QImage(frame.data, w, h, bytes_per_line, QImage.Format_RGB888)
+                q_image = q_image.scaled(self.ui.videoCamaraQr.width(), self.ui.videoCamaraQr.height())
 
-            self.ui.videoCamaraQr.setPixmap(QtGui.QPixmap.fromImage(q_image))
-            
-    def closeEvent(self, event):
-        self.cap.release()
-        event.accept()
+                self.ui.videoCamaraQr.setPixmap(QtGui.QPixmap.fromImage(q_image))
         
     def mostrar_hora(self,val):
         self.ui.lblHora.setText(val)
@@ -440,6 +449,12 @@ class AplicacionPrincipal(QMainWindow):
         
         resultadoPassword = self.conexion.db_extraerPassword()
         passwordEliminar = resultadoPassword
+    
+    def fn_asignaUtilizaCamara(self):
+        global utilizaCamara
+        
+        resultadoUtilizaCamara = self.conexion.db_extraerUtilizaCamara()
+        utilizaCamara = resultadoUtilizaCamara
         
     def fn_modal_principal(self):
         global pesoMaximo
@@ -610,6 +625,9 @@ class AplicacionPrincipal(QMainWindow):
             not frmAlertaDescuentoCodigoUsuario and
             not frmAlertaDescuentoSeleccionaEspecie and
             not frmAlertaDescuentoIngresaPeso and
+            not frmAlertaDescuentoCodigoUsuarioServis and
+            not frmAlertaDescuentoSeleccionaEspecieServis and
+            not frmAlertaDescuentoIngresaPesoServis and
             not frmAlertaEliminar
         )
         
@@ -627,6 +645,7 @@ class AplicacionPrincipal(QMainWindow):
             not self.ui.frmEditarPresentacion.isVisible() and
             not self.ui.frmDescuentoAlerta.isVisible() and
             not self.ui.frmAlertaDescuentoCodigoUsuario.isVisible() and
+            not self.ui.frmAlertaDescuentoServis.isVisible() and
             not self.ui.frmSombra.isVisible() and
             not self.ui.frmAlerta.isVisible()
         )
@@ -644,6 +663,7 @@ class AplicacionPrincipal(QMainWindow):
             not self.ui.frmEditarPresentacion.isVisible() and
             not self.ui.frmDescuentoAlerta.isVisible() and
             not self.ui.frmAlertaDescuentoCodigoUsuario.isVisible() and
+            not self.ui.frmAlertaDescuentoServis.isVisible() and
             not self.ui.frmAlertaEliminar.isVisible()
         )
          
@@ -663,6 +683,9 @@ class AplicacionPrincipal(QMainWindow):
         global frmAlertaDescuentoCodigoUsuario
         global frmAlertaDescuentoSeleccionaEspecie
         global frmAlertaDescuentoIngresaPeso
+        global frmAlertaDescuentoCodigoUsuarioServis
+        global frmAlertaDescuentoSeleccionaEspecieServis
+        global frmAlertaDescuentoIngresaPesoServis
         
         global frmIngresarPasswordAdministradorTara
         global frmIngresarPasswordAdministradorEditarPesada
@@ -673,6 +696,8 @@ class AplicacionPrincipal(QMainWindow):
         global codigoColaboradorNuevo
         global codigoColaboradorDescuento
         global presentacionDescuento
+        global codigoColaboradorDescuentoServis
+        global presentacionDescuentoServis
         
         if (event.key() == Qt.Key_1) and self.ui.frmFinalizarAlerta.isVisible() and frmFinalizarAlerta:
             if acumuladoLote != 0:
@@ -856,9 +881,69 @@ class AplicacionPrincipal(QMainWindow):
             
             codigoColaboradorDescuento = 0
             presentacionDescuento = ""
+            
+        if (event.key() == Qt.Key_1) and self.ui.frmAlertaDescuentoServis.isVisible() and frmAlertaDescuentoSeleccionaEspecieServis:
+            self.fn_seleccionarEspecieDescuentoServis(1)
+        
+        if (event.key() == Qt.Key_2) and self.ui.frmAlertaDescuentoServis.isVisible() and frmAlertaDescuentoSeleccionaEspecieServis:
+            self.fn_seleccionarEspecieDescuentoServis(2)
+        
+        if (event.key() == Qt.Key_3) and self.ui.frmAlertaDescuentoServis.isVisible() and frmAlertaDescuentoSeleccionaEspecieServis:
+            self.fn_seleccionarEspecieDescuentoServis(3)
+        
+        if (event.key() == Qt.Key_4) and self.ui.frmAlertaDescuentoServis.isVisible() and frmAlertaDescuentoSeleccionaEspecieServis:
+            self.fn_seleccionarEspecieDescuentoServis(4)
+        
+        if (event.key() == Qt.Key_5) and self.ui.frmAlertaDescuentoServis.isVisible() and frmAlertaDescuentoSeleccionaEspecieServis:
+            self.fn_seleccionarEspecieDescuentoServis(5)
+            
+        if (event.key() == Qt.Key_Enter or event.key() == Qt.Key_Return) and self.ui.frmAlertaDescuentoServis.isVisible() and frmAlertaDescuentoIngresaPesoServis:
+            txtIngresarPesoDescuentoServis = self.ui.txtIngresarPesoDescuentoServis.text()
+            if txtIngresarPesoDescuentoServis != "":
+                txtIngresarPesoDescuentoServis = float(txtIngresarPesoDescuentoServis)
+                if txtIngresarPesoDescuentoServis != 0:
+                    frmAlertaDescuentoIngresaPesoServis = False
+                    self.ui.frmAlertaDescuentoServis.setHidden(True)
+                    self.fn_registrarDescuentoServis()
+                else:
+                    self.fn_alerta("¡ERROR AL DESCONTAR!",error,"El valor no puede ser 0.",1000)
+            else:
+                self.fn_alerta("¡ERROR AL DESCONTAR!",error,"Debe ingresar un valor.",1000)
+            
+        if (event.key() == Qt.Key_Enter or event.key() == Qt.Key_Return) and self.ui.frmAlertaDescuentoServis.isVisible() and frmAlertaDescuentoSeleccionaEspecieServis:
+            if presentacionDescuentoServis != "":
+                frmAlertaDescuentoSeleccionaEspecieServis = False
+                frmAlertaDescuentoIngresaPesoServis = True
+                self.ui.txtIngresarPesoDescuentoServis.setEnabled(True)
+                self.ui.txtIngresarPesoDescuentoServis.setFocus(True)
+                self.ui.txtIngresarPesoDescuentoServis.setText("")
+            else:
+                self.fn_alerta("¡ERROR DE SELECCION!",error,"Debe seleccionar una presentación.",1000)
+            
+        if (event.key() == Qt.Key_Enter or event.key() == Qt.Key_Return) and self.ui.frmAlertaDescuentoServis.isVisible() and frmAlertaDescuentoCodigoUsuarioServis:
+            if codigoColaboradorDescuentoServis != 0:
+                frmAlertaDescuentoCodigoUsuarioServis = False
+                frmAlertaDescuentoSeleccionaEspecieServis = True
+                self.ui.txtIngresarCodigoServisDescuento.setFocus(False)
+                self.ui.txtIngresarCodigoServisDescuento.setEnabled(False)
+            else:
+                self.fn_alerta("¡ERROR DE SELECCION!",error,"Debe seleccionar un servis.",1000)
         
         if (event.key() == Qt.Key_2) and self.ui.frmDescuentoAlerta.isVisible() and frmDescuentoAlerta:
-            pass
+            frmDescuentoAlerta = False
+            self.ui.frmDescuentoAlerta.setHidden(True)
+            frmAlertaDescuentoCodigoUsuarioServis = True
+            self.ui.frmAlertaDescuentoServis.setHidden(False)
+            
+            self.ui.txtIngresarPesoDescuentoServis.setFocus(False)
+            self.ui.txtIngresarPesoDescuentoServis.setEnabled(False)
+            
+            self.ui.txtIngresarCodigoServisDescuento.setEnabled(True)
+            self.ui.txtIngresarCodigoServisDescuento.setFocus(True)
+            self.ui.txtIngresarCodigoServisDescuento.setText("")
+            
+            codigoColaboradorDescuentoServis = 0
+            presentacionDescuentoServis = ""
                 
         if (event.key() == Qt.Key_Enter or event.key() == Qt.Key_Return) and self.ui.frmSeleccionarEditarPesada.isVisible() and frmSeleccionarEditarPesada:
             numeroDePesada = int(self.ui.txtNumeroDePesada.text())
@@ -1025,6 +1110,12 @@ class AplicacionPrincipal(QMainWindow):
                 frmAlertaDescuentoCodigoUsuario = False
                 frmAlertaDescuentoSeleccionaEspecie = False
                 frmAlertaDescuentoIngresaPeso = False
+            if (self.ui.frmAlertaDescuentoServis.isVisible()):
+                self.ui.frmSombra.setHidden(True)
+                self.ui.frmAlertaDescuentoServis.setHidden(True)
+                frmAlertaDescuentoCodigoUsuarioServis = False
+                frmAlertaDescuentoSeleccionaEspecieServis = False
+                frmAlertaDescuentoIngresaPesoServis = False
             if (self.ui.frmIngresarPasswordAdministrador.isVisible()):
                 self.ui.frmSombra.setHidden(True)
                 self.ui.frmIngresarPasswordAdministrador.setHidden(True)
@@ -1120,6 +1211,35 @@ class AplicacionPrincipal(QMainWindow):
         else:
             self.ui.lblCodigoColaboradorDescuento.setText("*****")
             codigoColaboradorDescuento = 0
+    
+    def fn_recepcionaCodigoServisDescuento(self):
+        global codigoColaboradorDescuentoServis
+        
+        sender = self.sender()
+
+        if sender is not None and isinstance(sender, QLineEdit):
+            texto = sender.text()
+
+            texto_valido = ''.join(filter(str.isdigit, texto))
+
+            sender.setText(texto_valido)
+        
+        txtIngresarCodigoServisDescuento = self.ui.txtIngresarCodigoServisDescuento.text()
+
+        if (txtIngresarCodigoServisDescuento != "" and len(txtIngresarCodigoServisDescuento) >= 1):
+
+            nombreServisSeleccionar = self.conexion.db_buscaServis(txtIngresarCodigoServisDescuento)
+
+            if (len(nombreServisSeleccionar) > 0):
+                self.ui.lblCodigoServisDescuento.setText(str(nombreServisSeleccionar[0][0]))
+                codigoColaboradorDescuentoServis = nombreServisSeleccionar[0][1]
+            else:
+                self.ui.lblCodigoServisDescuento.setText("SERVIS NO ENCONTRADO")
+                codigoColaboradorDescuentoServis = 0
+                
+        else:
+            self.ui.lblCodigoServisDescuento.setText("*****")
+            codigoColaboradorDescuentoServis = 0
     
     def fn_asignaPesosMaximosYTaras(self):
         global pesoMaximoTalloSolo
@@ -1422,13 +1542,52 @@ class AplicacionPrincipal(QMainWindow):
         elif(especie == 5):
             presentacionDescuento = "OTROS"
             self.ui.lblDescuentoPresentacionOtros.setStyleSheet("background-color: rgb(255, 207, 11); color: #000; border-top-left-radius: 10px; border-top-right-radius: 10px;")
+        
+    def fn_seleccionarEspecieDescuentoServis(self, especie):
+        global presentacionDescuentoServis
+        
+        self.ui.lblDescuentoPresentacionTalloSoloServis.setStyleSheet("color: rgb(255, 255, 255); border-top-left-radius: 10px; border-top-right-radius: 10px; background-color: rgb(29, 71, 131);")
+        self.ui.lblDescuentoPresentacionTalloCoralServis.setStyleSheet("color: rgb(255, 255, 255); border-top-left-radius: 10px; border-top-right-radius: 10px; background-color: rgb(29, 71, 131);")
+        self.ui.lblDescuentoPresentacionMediaValvaTalloSoloServis.setStyleSheet("color: rgb(255, 255, 255); border-top-left-radius: 10px; border-top-right-radius: 10px; background-color: rgb(29, 71, 131);")
+        self.ui.lblDescuentoPresentacionMediaValvaTalloCoralServis.setStyleSheet("color: rgb(255, 255, 255); border-top-left-radius: 10px; border-top-right-radius: 10px; background-color: rgb(29, 71, 131);")
+        self.ui.lblDescuentoPresentacionOtros.setStyleSheet("color: rgb(255, 255, 255); border-top-left-radius: 10px; border-top-right-radius: 10px; background-color: rgb(29, 71, 131);")
+        presentacionDescuentoServis = ""
+        
+        if(especie == 1):
+            presentacionDescuentoServis = "TALLO SOLO"
+            self.ui.lblDescuentoPresentacionTalloSoloServis.setStyleSheet("background-color: rgb(255, 207, 11); color: #000; border-top-left-radius: 10px; border-top-right-radius: 10px;")
+        elif(especie == 2):
+            presentacionDescuentoServis = "TALLO CORAL"
+            self.ui.lblDescuentoPresentacionTalloCoralServis.setStyleSheet("background-color: rgb(255, 207, 11); color: #000; border-top-left-radius: 10px; border-top-right-radius: 10px;")
+        elif(especie == 3):
+            presentacionDescuentoServis = "MEDIA VALVA T/S"
+            self.ui.lblDescuentoPresentacionMediaValvaTalloSoloServis.setStyleSheet("background-color: rgb(255, 207, 11); color: #000; border-top-left-radius: 10px; border-top-right-radius: 10px;")
+        elif(especie == 4):
+            presentacionDescuentoServis = "MEDIA VALVA T/C"
+            self.ui.lblDescuentoPresentacionMediaValvaTalloCoralServis.setStyleSheet("background-color: rgb(255, 207, 11); color: #000; border-top-left-radius: 10px; border-top-right-radius: 10px;")
+        elif(especie == 5):
+            presentacionDescuentoServis = "OTROS"
+            self.ui.lblDescuentoPresentacionOtrosServis.setStyleSheet("background-color: rgb(255, 207, 11); color: #000; border-top-left-radius: 10px; border-top-right-radius: 10px;")
             
     def fn_registrarDescuento(self):
         horaDescuento = datetime.now().strftime('%H:%M:%S')
         txtIngresarPesoDescuento = self.ui.txtIngresarPesoDescuento.text()
         self.conexion.db_aplicarDescuentoPersonal(numeroProceso, numeroLote, fechaInicioProceso, horaDescuento, presentacionDescuento, txtIngresarPesoDescuento, codigoColaboradorDescuento)
         self.fn_listarPesadas()
-        self.fn_alerta("ACTUALIZACIÓN CORRECTA!",correcto,"El registro se ha actualizado correctamente.")
+        self.fn_alerta("DESCUENTO CORRECTO!",correcto,"El descuento se ha registrado correctamente.")
+    
+    def fn_registrarDescuentoServis(self):
+        txtIngresarPesoDescuentoServis = self.ui.txtIngresarPesoDescuentoServis.text()
+        
+        respuestaClientesServices = self.conexion.db_traerClientesServis(codigoColaboradorDescuentoServis)
+        
+        for clienteServis in respuestaClientesServices:
+            codigoColaboradorDescuentoBucleServis = clienteServis[1]
+            horaDescuento = datetime.now().strftime('%H:%M:%S')
+            self.conexion.db_aplicarDescuentoPersonal(numeroProceso, numeroLote, fechaInicioProceso, horaDescuento, presentacionDescuentoServis, txtIngresarPesoDescuentoServis, codigoColaboradorDescuentoBucleServis)
+        
+        self.fn_listarPesadas()
+        self.fn_alerta("DESCUENTO CORRECTO!",correcto,"El descuento se ha registrado correctamente.")
     
 # DISEÑADO Y DESARROLLADO POR SANTOS VILCHEZ EDINSON PASCUAL
 # LA UNIÓN - PIURA - PERU ; 2024

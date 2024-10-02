@@ -5,6 +5,7 @@ from PyQt5.QtGui import *
 from PyQt5 import QtCore, QtGui
 from PyQt5.QtWidgets import QMainWindow
 import sys
+import os
 from View.Ui_modal_inicio import Ui_Modal_Inicio
 import InicioSistema
 
@@ -26,53 +27,56 @@ class ModalPrincipal(QMainWindow):
         self.ui.lblImgReestablecer.setPixmap(QPixmap("Resources/reestablecer.png"))
         self.ui.lblImgApagar.setPixmap(QPixmap("Resources/off_ok.png"))
         self.ui.lblImgIniciarProceso.setPixmap(QPixmap("Resources/iniciar.png"))
+        self.ui.imgFinalizar.setPixmap(QPixmap("Resources/error.png"))
+        
+        self.ui.frmSombra.setHidden(True)
         
     def keyReleaseEvent(self, event):
             
-        if (event.key() == Qt.Key_1):
+        if (event.key() == Qt.Key_1) and not self.ui.frmSombra.isVisible():
             if not InicioSistema.seleccionarTalloSolo:
                 InicioSistema.seleccionarTalloSolo = True
-                self.ui.lblTalloSolo.setStyleSheet("background-color: rgb(20, 180, 60);""border-radius: 10px;""border: none;""color: rgb(255, 255, 255);""padding-left: 40;")
+                self.ui.lblTalloSolo.setStyleSheet("background-color: rgb(20, 180, 60);""border-top-left-radius: 10px;""border-top-right-radius: 10px;""border: none;""color: rgb(255, 255, 255);""padding-left: 40;")
             else:
                 InicioSistema.seleccionarTalloSolo = False
-                self.ui.lblTalloSolo.setStyleSheet("background-color: rgb(255, 207, 11);""border-radius: 10px;""border: none;""color: rgb(255, 255, 255);""padding-left: 40;")
+                self.ui.lblTalloSolo.setStyleSheet("background-color: rgb(255, 207, 11);""border-top-left-radius: 10px;""border-top-right-radius: 10px;""border: none;""color: rgb(255, 255, 255);""padding-left: 40;")
             
-        if (event.key() == Qt.Key_2):
+        if (event.key() == Qt.Key_2) and not self.ui.frmSombra.isVisible():
             if not InicioSistema.seleccionarTalloCoral:
                 InicioSistema.seleccionarTalloCoral = True
-                self.ui.lblTalloCoral.setStyleSheet("background-color: rgb(20, 180, 60);""border-radius: 10px;""border: none;""color: rgb(255, 255, 255);""padding-left: 55;")
+                self.ui.lblTalloCoral.setStyleSheet("background-color: rgb(20, 180, 60);""border-top-left-radius: 10px;""border-top-right-radius: 10px;""border: none;""color: rgb(255, 255, 255);""padding-left: 55;")
             else:
                 InicioSistema.seleccionarTalloCoral = False
-                self.ui.lblTalloCoral.setStyleSheet("background-color: rgb(255, 207, 11);""border-radius: 10px;""border: none;""color: rgb(255, 255, 255);""padding-left: 55;")
+                self.ui.lblTalloCoral.setStyleSheet("background-color: rgb(255, 207, 11);""border-top-left-radius: 10px;""border-top-right-radius: 10px;""border: none;""color: rgb(255, 255, 255);""padding-left: 55;")
             
-        if (event.key() == Qt.Key_3):
+        if (event.key() == Qt.Key_3) and not self.ui.frmSombra.isVisible():
             if not InicioSistema.seleccionarMediaValvaTs:
                 InicioSistema.seleccionarMediaValvaTs = True
-                self.ui.lblMediaValvaTs.setStyleSheet("background-color: rgb(20, 180, 60);""border-radius: 10px;""border: none;""color: rgb(255, 255, 255);""padding-left: 50;")
+                self.ui.lblMediaValvaTs.setStyleSheet("background-color: rgb(20, 180, 60);""border-top-left-radius: 10px;""border-top-right-radius: 10px;""border: none;""color: rgb(255, 255, 255);""padding-left: 50;")
             else:
                 InicioSistema.seleccionarMediaValvaTs = False
-                self.ui.lblMediaValvaTs.setStyleSheet("background-color: rgb(255, 207, 11);""border-radius: 10px;""border: none;""color: rgb(255, 255, 255);""padding-left: 50;")
+                self.ui.lblMediaValvaTs.setStyleSheet("background-color: rgb(255, 207, 11);""border-top-left-radius: 10px;""border-top-right-radius: 10px;""border: none;""color: rgb(255, 255, 255);""padding-left: 50;")
             
-        if (event.key() == Qt.Key_4):
+        if (event.key() == Qt.Key_4) and not self.ui.frmSombra.isVisible():
             if not InicioSistema.seleccionarMediaValvaTc:
                 InicioSistema.seleccionarMediaValvaTc = True
-                self.ui.lblMediaValvaTc.setStyleSheet("background-color: rgb(20, 180, 60);""border-radius: 10px;""border: none;""color: rgb(255, 255, 255);""padding-left: 50;")
+                self.ui.lblMediaValvaTc.setStyleSheet("background-color: rgb(20, 180, 60);""border-top-left-radius: 10px;""border-top-right-radius: 10px;""border: none;""color: rgb(255, 255, 255);""padding-left: 50;")
             else:
                 InicioSistema.seleccionarMediaValvaTc = False
-                self.ui.lblMediaValvaTc.setStyleSheet("background-color: rgb(255, 207, 11);""border-radius: 10px;""border: none;""color: rgb(255, 255, 255);""padding-left: 50;")
+                self.ui.lblMediaValvaTc.setStyleSheet("background-color: rgb(255, 207, 11);""border-top-left-radius: 10px;""border-top-right-radius: 10px;""border: none;""color: rgb(255, 255, 255);""padding-left: 50;")
             
-        if (event.key() == Qt.Key_5):
+        if (event.key() == Qt.Key_5) and not self.ui.frmSombra.isVisible():
             if not InicioSistema.seleccionarOtros:
                 InicioSistema.seleccionarOtros = True
-                self.ui.lblOtros.setStyleSheet("background-color: rgb(20, 180, 60);""border-radius: 10px;""border: none;""color: rgb(255, 255, 255);""padding-left: 30;")
+                self.ui.lblOtros.setStyleSheet("background-color: rgb(20, 180, 60);""border-top-left-radius: 10px;""border-top-right-radius: 10px;""border: none;""color: rgb(255, 255, 255);""padding-left: 30;")
             else:
                 InicioSistema.seleccionarOtros = False
-                self.ui.lblOtros.setStyleSheet("background-color: rgb(255, 207, 11);""border-radius: 10px;""border: none;""color: rgb(255, 255, 255);""padding-left: 30;")
+                self.ui.lblOtros.setStyleSheet("background-color: rgb(255, 207, 11);""border-top-left-radius: 10px;""border-top-right-radius: 10px;""border: none;""color: rgb(255, 255, 255);""padding-left: 30;")
             
-        if (event.key() == Qt.Key_Minus):
+        if (event.key() == Qt.Key_Minus) and not self.ui.frmSombra.isVisible():
             self.fn_resetearSeleccion()
             
-        if (event.key() == Qt.Key_Enter or event.key() == Qt.Key_Return):      
+        if (event.key() == Qt.Key_Enter or event.key() == Qt.Key_Return) and not self.ui.frmSombra.isVisible():      
             self.aplicacion_Principal = InicioSistema.AplicacionPrincipal()
             
             frames = [
@@ -107,6 +111,18 @@ class ModalPrincipal(QMainWindow):
             self.aplicacion_Principal.fn_verificarProceso()
             self.aplicacion_Principal.fn_listarPesadas()
             self.close()
+            
+        if (event.key() == Qt.Key_1) and self.ui.frmSombra.isVisible():
+            os.system("shutdown -s")
+        
+        if (event.key() == Qt.Key_2) and self.ui.frmSombra.isVisible():
+            os.system("shutdown -r")
+            
+        if (event.key() == Qt.Key_3) and self.ui.frmSombra.isVisible():
+            self.ui.frmSombra.setHidden(True)
+            
+        if (event.key() == Qt.Key_0) and not self.ui.frmSombra.isVisible():
+            self.ui.frmSombra.setHidden(False)
             
     def fn_resetearSeleccion(self):
         InicioSistema.seleccionarTalloSolo = False
