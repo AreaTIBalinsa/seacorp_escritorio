@@ -341,9 +341,6 @@ class AplicacionPrincipal(QMainWindow):
             self.worker.update_peso.connect(self.fn_actualizar_peso)
             self.worker.update_estado.connect(self.fn_actualizar_estado)
             
-            # self.workerBase = WorkerThreadSubirDatosBase()
-            # self.workerBase.start()
-            
             self.fn_asignaPesosMaximosYTaras()
             self.fn_asignarPassword()
             
@@ -391,6 +388,10 @@ class AplicacionPrincipal(QMainWindow):
             self.tablaDePesos.setColumnWidth(8, 100)
             self.tablaDePesos.setColumnWidth(9, 80)
             self.tablaDePesos.setColumnHidden(10, True)
+            
+            # self.conexion.db_actualizar_datos_local_colaboradores()
+            # self.workerBase = WorkerThreadSubirDatosBase()
+            # self.workerBase.start()
         
     def update_frame(self):
         if self.cap is not None:
@@ -1426,7 +1427,7 @@ class AplicacionPrincipal(QMainWindow):
         self.fn_listarPesadas()
         
     def fn_accionarPulsos(self, pesoIndicador, pesoMaximo):
-        if pesoIndicador >= pesoMaximo:
+        if float(pesoIndicador) >= pesoMaximo:
             self.pulsosArduino.fn_registroExcesoPeso()
         else:
             self.pulsosArduino.fn_registroCorrecto()

@@ -1,18 +1,24 @@
 import mysql.connector
 
+hostLocal="localhost"
+userLocal="root"
+passwordLocal=""
+databaseLocal="seacorp"
+portLocal="3306"
+
 hostServidor="199.168.*.*"
 userServidor="seacorp_admin"
-passwordServidor="seacorp"
-databaseServidor="db_seacorp"
+passwordServidor="Seacorp2024#."
+databaseServidor="seacorp"
 
 class Conectar():
     def __init__(self):
         # Conexion para MySql
-        self.conexionsql = mysql.connector.connect(host='localhost',
-                                        user='root',
-                                        password='',
-                                        database='seacorp',
-                                        port='3306')
+        self.conexionsql = mysql.connector.connect(host = hostLocal,
+                                        user = userLocal,
+                                        password = passwordLocal,
+                                        database = databaseLocal,
+                                        port = portLocal)
         
     def db_seleccionaPuertoArduino(self):
         try:
@@ -374,7 +380,15 @@ class Conectar():
     
     def db_enviar_datos_servidor_lotes(self):
         try:
-            local_cursor = self.conexionsql.cursor()
+            conexionLocal = mysql.connector.connect(
+                host = hostLocal,
+                user = userLocal,
+                password = passwordLocal,
+                database = databaseLocal,
+                port = portLocal
+            )
+            
+            local_cursor = conexionLocal.cursor()
 
             query = "SELECT * FROM tb_lotes"
             local_cursor.execute(query)
@@ -421,9 +435,73 @@ class Conectar():
                 print("Cursor local cerrado")
 
     
+    def db_actualizar_datos_servidor_procesos(self):
+        try:
+            conexionLocal = mysql.connector.connect(
+                host = hostLocal,
+                user = userLocal,
+                password = passwordLocal,
+                database = databaseLocal,
+                port = portLocal
+            )
+            
+            local_cursor = conexionLocal.cursor()
+
+            query = "SELECT * FROM tb_procesos"
+            local_cursor.execute(query)
+            local_data = local_cursor.fetchall()
+
+            if local_data:
+                conexionRemota = mysql.connector.connect(
+                    host = hostServidor,
+                    user = userServidor,
+                    password = passwordServidor,
+                    database = databaseServidor
+                )
+
+                remoto_cursor = conexionRemota.cursor()
+
+                for data in local_data:
+                    try:
+                        query = """INSERT INTO tb_procesos 
+                                            (idProceso, fechaInicio, horainicio, fechaFin, horaFin, acumulado, finProceso) 
+                                            VALUES (%s, %s, %s, %s, %s, %s, %s)
+                                            ON DUPLICATE KEY UPDATE
+                                            fechaInicio = VALUES(fechaInicio),
+                                            horainicio = VALUES(horainicio),
+                                            fechaFin = VALUES(fechaFin),
+                                            horaFin = VALUES(horaFin),
+                                            acumulado = VALUES(acumulado),
+                                            finProceso = VALUES(finProceso)
+                                            """
+                        remoto_cursor.execute(query, data)
+                        conexionRemota.commit()
+                    except mysql.connector.Error as e:
+                        print("Error al ejecutar consulta remota:", e)
+                    finally:
+                        remoto_cursor.close()
+
+        except mysql.connector.Error as error:
+            print("Error al conectar a la base de datos local:", error)
+        finally:
+            if 'conexionRemota' in locals() and conexionRemota.is_connected():
+                conexionRemota.close()
+                print("Conexión remota cerrada")
+            if 'local_cursor' in locals() and local_cursor:
+                local_cursor.close()
+                print("Cursor local cerrado")
+    
     def db_actualizar_datos_servidor_pesadas(self):
         try:
-            local_cursor = self.conexionsql.cursor()
+            conexionLocal = mysql.connector.connect(
+                host = hostLocal,
+                user = userLocal,
+                password = passwordLocal,
+                database = databaseLocal,
+                port = portLocal
+            )
+            
+            local_cursor = conexionLocal.cursor()
 
             query = "SELECT * FROM tb_pesadas"
             local_cursor.execute(query)
@@ -476,7 +554,15 @@ class Conectar():
     
     def db_actualizar_datos_servidor_descuentos(self):
         try:
-            local_cursor = self.conexionsql.cursor()
+            conexionLocal = mysql.connector.connect(
+                host = hostLocal,
+                user = userLocal,
+                password = passwordLocal,
+                database = databaseLocal,
+                port = portLocal
+            )
+            
+            local_cursor = conexionLocal.cursor()
 
             query = "SELECT * FROM tb_descuentos"
             local_cursor.execute(query)
