@@ -10,6 +10,7 @@ import socket
 from datetime import datetime, timedelta, date
 import cv2
 from pyzbar.pyzbar import decode
+import threading
 
 from View.Ui_Principal import Ui_MainWindow
 import ModalInicio
@@ -1415,11 +1416,20 @@ class AplicacionPrincipal(QMainWindow):
         self.ui.txtCodigoColaborador.setEnabled(False)
         self.ui.txtCodigoColaborador.setFocus(False)
         self.ui.txtCodigoColaborador.setText("")
+            
+        thread = threading.Thread(target=self.fn_accionarPulsos, args=(pesoIndicador, pesoMaximo))
+        thread.start()
         
         captaCodigo = True
         captaCodigoQr = False
         pesoExcedido = 0
         self.fn_listarPesadas()
+        
+    def fn_accionarPulsos(self, pesoIndicador, pesoMaximo):
+        if pesoIndicador >= pesoMaximo:
+            self.pulsosArduino.fn_registroExcesoPeso()
+        else:
+            self.pulsosArduino.fn_registroCorrecto()
         
     def fn_listarPesadas(self):
         global acumuladoProceso

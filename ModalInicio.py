@@ -8,12 +8,15 @@ import sys
 import os
 from View.Ui_modal_inicio import Ui_Modal_Inicio
 import InicioSistema
+import pulsosArduino
 
 class ModalPrincipal(QMainWindow):
     def __init__(self):
         super().__init__()
         self.ui = Ui_Modal_Inicio()
         self.ui.setupUi(self)
+        self.pulsosArduino = pulsosArduino
+        
         self.setWindowFlag(QtCore.Qt.FramelessWindowHint)
         self.setWindowIcon(QtGui.QIcon("Resources/icon.jpg"))
         self.setWindowTitle('SISTEMA INTEGRAL || BALINSA')
@@ -113,9 +116,11 @@ class ModalPrincipal(QMainWindow):
             self.close()
             
         if (event.key() == Qt.Key_1) and self.ui.frmSombra.isVisible():
+            self.pulsosArduino.fn_apagarIndicador()
             os.system("shutdown -s")
         
         if (event.key() == Qt.Key_2) and self.ui.frmSombra.isVisible():
+            self.pulsosArduino.fn_apagarIndicador()
             os.system("shutdown -r")
             
         if (event.key() == Qt.Key_3) and self.ui.frmSombra.isVisible():
