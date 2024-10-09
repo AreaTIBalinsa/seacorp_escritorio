@@ -92,6 +92,7 @@ presentacionDescuento = ""
 presentacionDescuentoServis = ""
 
 passwordEliminar = ""
+numeroDePesada = 0
 
 # Variables de rutas de imagenes para alerta
 correcto = "Resources/correcto.png"
@@ -317,7 +318,7 @@ class AplicacionPrincipal(QMainWindow):
 
                 self.timer = QTimer()
                 self.timer.timeout.connect(self.update_frame)
-                self.timer.start(30)
+                self.timer.start(100)
             else:
                 self.cap = None
             
@@ -406,6 +407,21 @@ class AplicacionPrincipal(QMainWindow):
                     if(captaCodigo and captaCodigoQr):
                         self.ui.txtCodigoColaborador.setText(qr_data)
                         self.ui.txtCodigoColaborador.setFocus(True)
+                        
+                        try:
+                            pesoIndicador = float(self.ui.lblPesoIndicador.text())
+                            if presentacion != "":
+                                if pesoIndicador > 0:
+                                    if codigoColaborador != 0:
+                                        self.fn_guardarPesada()
+                                    else:
+                                        self.fn_alerta("¡ERROR AL REGISTRAR!",error,"Debe seleccionar un colaborador.",1000)
+                                else:
+                                    self.fn_alerta("¡ERROR AL REGISTRAR!",error,"El peso no puede ser 0.",1000)
+                            else:
+                                self.fn_alerta("¡ERROR AL REGISTRAR!",error,"Debe seleccionar una presentación.",1000)
+                        except ValueError:
+                            print("El valor del peso no es válido")
                     else:
                         self.ui.txtCodigoColaborador.setText("")
                     
@@ -588,7 +604,7 @@ class AplicacionPrincipal(QMainWindow):
         elif (val == "1"):
             self.ui.lblEstadoIndicador.setStyleSheet("background-color: rgb(20, 180, 60); border-radius: 10px;")
             
-    def fn_alerta(self,titulo,imagen,mensaje,tiempo = 500):
+    def fn_alerta(self,titulo,imagen,mensaje,tiempo = 500, pesado = False):
         if imagen == correcto:
             self.ui.lblAlertaTitulo.setStyleSheet("color: #24D315")
             self.ui.lblAlertaTexto.setStyleSheet("font-size:16pt;")
@@ -600,6 +616,13 @@ class AplicacionPrincipal(QMainWindow):
         self.ui.lblAlertaTitulo.setText(titulo)
         self.ui.imgIconAlerta.setPixmap(QPixmap(imagen))
         self.ui.lblAlertaTexto.setText(mensaje)
+        if pesado:
+            nombreColaborador = self.ui.txtNombreDelColaborador.text()
+            self.ui.lblNombreColaborador.setText(nombreColaborador)
+            self.ui.lblAlertaTexto.setGeometry(QtCore.QRect(50, 300, 600, 50))
+        else:
+            self.ui.lblNombreColaborador.setText("")
+            self.ui.lblAlertaTexto.setGeometry(QtCore.QRect(50, 300, 600, 100))
 
         timer = QtCore.QTimer()
         timer.singleShot(tiempo, lambda: self.ui.frmAlerta.setHidden(True))
@@ -796,7 +819,10 @@ class AplicacionPrincipal(QMainWindow):
                 self.ui.frmSombra.setHidden(True)
                 self.ui.frmAlertaEditarCodigoUsuario.setHidden(True)
                 self.fn_alerta("ACTUALIZACIÓN CORRECTA!",correcto,"El registro se ha actualizado correctamente.")
-                self.fn_listarPesadas()
+                nombreColaborador = self.ui.lblNuevoCodigoColaborador.text()
+                nuevo_valor_columna_1 = nombreColaborador + " - " + str(codigoColaboradorNuevo)
+                self.fn_actualizaColaboradorEnProceso(idPesadaEditarOEliminar, nuevo_valor_columna_1)
+                # self.fn_listarPesadas()
             else:
                 self.fn_alerta("¡ERROR AL REGISTRAR!",error,"Debe seleccionar un colaborador.",1000)
                 
@@ -1127,6 +1153,34 @@ class AplicacionPrincipal(QMainWindow):
     
     # ======================== Termina eventos con el Teclado ========================
     
+    def fn_actualizaColaboradorEnProceso(self, idPesadaEditarOEliminar, nuevo_valor_columna_1):
+        row_count = self.tablaDePesos.rowCount()
+
+        for fila in range(row_count):
+            item_col_10 = self.tablaDePesos.item(fila, 10)
+
+            if item_col_10 is not None and item_col_10.text() == str(idPesadaEditarOEliminar):
+                item_col_1 = QTableWidgetItem(str(nuevo_valor_columna_1))
+
+                item_col_1.setTextAlignment(Qt.AlignCenter)
+
+                self.tablaDePesos.setItem(fila, 1, item_col_1)
+                break
+    
+    def fn_actualizaPresentacionEnProceso(self, idPesadaEditarOEliminar, nuevo_valor_columna_1):
+        row_count = self.tablaDePesos.rowCount()
+
+        for fila in range(row_count):
+            item_col_10 = self.tablaDePesos.item(fila, 10)
+
+            if item_col_10 is not None and item_col_10.text() == str(idPesadaEditarOEliminar):
+                item_col_1 = QTableWidgetItem(str(nuevo_valor_columna_1))
+
+                item_col_1.setTextAlignment(Qt.AlignCenter)
+
+                self.tablaDePesos.setItem(fila, 2, item_col_1)
+                break
+    
     def fn_recepcionaCodigoColaborador(self):
         global codigoColaborador
         
@@ -1285,6 +1339,20 @@ class AplicacionPrincipal(QMainWindow):
             self.ui.txtTaraMediaValvaTalloSolo.setText(f"Tara: {format(pesoTaraMediaValvaTalloSolo*1000, '.0f')} Gr")
             self.ui.txtTaraMediaValvaTalloCoral.setText(f"Tara: {format(pesoTaraMediaValvaTalloCoral*1000, '.0f')} Gr")
             self.ui.txtTaraOtros.setText(f"Tara: {format(pesoTaraOtros*1000, '.0f')} Gr")
+            
+            especie = 0
+            if (presentacion == "TALLO SOLO"):
+                especie = 1
+            elif (presentacion == "TALLO CORAL"):
+                especie = 2
+            elif (presentacion == "MEDIA VALVA T/S"):
+                especie = 3
+            elif (presentacion == "MEDIA VALVA T/C"):
+                especie = 4
+            elif (presentacion == "OTROS"):
+                especie = 5
+                
+            self.fn_seleccionarEspecie(especie)
         except Exception as e:
             self.fn_alerta("¡ERROR!",error,"No se pudieron obtener los precios del cliente.", 2000)
     
@@ -1412,7 +1480,7 @@ class AplicacionPrincipal(QMainWindow):
         horaPeso = datetime.now().strftime('%H:%M:%S')
         
         self.conexion.db_guardarPesada(numeroProceso, numeroLote, presentacion, pesoIndicador, pesoTara, horaPeso, fechaInicioProceso, codigoColaborador, pesoExcedido)
-        self.fn_alerta("REGISTRO CORRECTO!",correcto,"El registro se ha guardado correctamente.")
+        self.fn_alerta("REGISTRO CORRECTO!",correcto,"El registro se ha guardado correctamente para:", 500, True)
         
         self.ui.txtCodigoColaborador.setEnabled(False)
         self.ui.txtCodigoColaborador.setFocus(False)
@@ -1424,7 +1492,8 @@ class AplicacionPrincipal(QMainWindow):
         captaCodigo = True
         captaCodigoQr = False
         pesoExcedido = 0
-        self.fn_listarPesadas()
+        # self.fn_listarPesadas()
+        self.fn_listarPesadasEnProceso()
         
     def fn_accionarPulsos(self, pesoIndicador, pesoMaximo):
         if float(pesoIndicador) >= pesoMaximo:
@@ -1436,6 +1505,7 @@ class AplicacionPrincipal(QMainWindow):
         global acumuladoProceso
         global acumuladoLote
         global listoParaAccionar
+        global numeroDePesada
         
         resultadoAcumuladoProceso = self.conexion.db_traerAcumuladoProceso(numeroProceso)
         acumuladoProceso = resultadoAcumuladoProceso if resultadoAcumuladoProceso is not None else 0
@@ -1452,6 +1522,7 @@ class AplicacionPrincipal(QMainWindow):
         pesosListarTabla = self.conexion.db_listarPesosTabla(fechaInicioProceso, numeroProceso, numeroLote)
         
         listoParaAccionar = False
+        numeroDePesada = 0
         
         if pesosListarTabla != "" and pesosListarTabla != None:
             if len(pesosListarTabla) > 0:
@@ -1466,9 +1537,61 @@ class AplicacionPrincipal(QMainWindow):
                             
                             if column_number == 0:  # Columna de "correlativo"
                                 data = (row_number - len(pesosListarTabla))*-1
+                                numeroDePesada = len(pesosListarTabla)
                                 
                             if column_number == 3:  # Columna de "Peso Neto"
                                 data = "{:.3f}".format(data)
+                            if column_number == 4:  # Columna de "TALLO SOLO"
+                                data = "{:.3f}".format(data)
+                            if column_number == 5:  # Columna de "TALLO CORAL"
+                                data = "{:.3f}".format(data)
+                            if column_number == 6:  # Columna de "MEDIA VALVA TALLO SOLO"
+                                data = "{:.3f}".format(data)
+                            if column_number == 7:  # Columna de "MEDIA VALVA TALLO CORAL"
+                                data = "{:.3f}".format(data)
+                            if column_number == 8:  # Columna de "OTROS"
+                                data = "{:.3f}".format(data)
+                            if column_number == 9 :  # Columna de "Hora Peso"
+                                hours, remainder = divmod(data.seconds, 3600)
+                                minutes, seconds = divmod(remainder, 60)
+                                data = "{:02}:{:02}:{:02}".format(hours, minutes, seconds)
+
+                            item = QTableWidgetItem(str(data))
+                            item.setTextAlignment(Qt.AlignCenter)
+                            self.tablaDePesos.setItem(row_number, column_number, item)
+                            
+    def fn_listarPesadasEnProceso(self):
+        global acumuladoProceso
+        global acumuladoLote
+        global listoParaAccionar
+        global numeroDePesada
+        
+        pesosListarTabla = self.conexion.db_listarPesosTablaEnProceso()
+        
+        listoParaAccionar = False
+        
+        if pesosListarTabla != "" and pesosListarTabla != None:
+            if len(pesosListarTabla) > 0:
+                
+                listoParaAccionar = True
+            
+                for row_number, row_data in enumerate(pesosListarTabla):
+                    
+                        self.tablaDePesos.insertRow(row_number)
+                        
+                        for column_number, data in enumerate(row_data):
+                            
+                            if column_number == 0:  # Columna de "correlativo"
+                                numeroDePesada = numeroDePesada + 1
+                                data = numeroDePesada
+                                
+                            if column_number == 3:  # Columna de "Peso Neto"
+                                acumuladoProceso += data
+                                acumuladoLote += data
+                                self.ui.txtAcumuladoPorProceso.setText("{:.3f}".format(acumuladoProceso))
+                                self.ui.txtAcumuladoPorLote.setText("{:.3f}".format(acumuladoLote))
+                                data = "{:.3f}".format(data)
+                                
                             if column_number == 4:  # Columna de "TALLO SOLO"
                                 data = "{:.3f}".format(data)
                             if column_number == 5:  # Columna de "TALLO CORAL"
@@ -1525,8 +1648,9 @@ class AplicacionPrincipal(QMainWindow):
         self.ui.frmSombra.setHidden(True)
         self.ui.frmEditarPresentacion.setHidden(True)
         frmEditarPresentacion = False
-        self.fn_listarPesadas()
+        # self.fn_listarPesadas()
         self.fn_alerta("ACTUALIZACIÓN CORRECTA!",correcto,"El registro se ha actualizado correctamente.")
+        self.fn_actualizaPresentacionEnProceso(idPesadaEditarOEliminar, codigoNuevaEspecie)
         
     def fn_seleccionarEspecieDescuento(self, especie):
         global presentacionDescuento
@@ -1584,7 +1708,7 @@ class AplicacionPrincipal(QMainWindow):
         horaDescuento = datetime.now().strftime('%H:%M:%S')
         txtIngresarPesoDescuento = self.ui.txtIngresarPesoDescuento.text()
         self.conexion.db_aplicarDescuentoPersonal(numeroProceso, numeroLote, fechaInicioProceso, horaDescuento, presentacionDescuento, txtIngresarPesoDescuento, codigoColaboradorDescuento)
-        self.fn_listarPesadas()
+        # self.fn_listarPesadas()
         self.fn_alerta("DESCUENTO CORRECTO!",correcto,"El descuento se ha registrado correctamente.")
     
     def fn_registrarDescuentoServis(self):
@@ -1597,7 +1721,7 @@ class AplicacionPrincipal(QMainWindow):
             horaDescuento = datetime.now().strftime('%H:%M:%S')
             self.conexion.db_aplicarDescuentoPersonal(numeroProceso, numeroLote, fechaInicioProceso, horaDescuento, presentacionDescuentoServis, txtIngresarPesoDescuentoServis, codigoColaboradorDescuentoBucleServis)
         
-        self.fn_listarPesadas()
+        # self.fn_listarPesadas()
         self.fn_alerta("DESCUENTO CORRECTO!",correcto,"El descuento se ha registrado correctamente.")
     
 # DISEÑADO Y DESARROLLADO POR SANTOS VILCHEZ EDINSON PASCUAL

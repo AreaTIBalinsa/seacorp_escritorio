@@ -53,15 +53,13 @@ void loop(){
 
     else if (val == 'x'){
       digitalWrite(ONOFF, LOW);
-      delay(500)
+      delay(1000)
       digitalWrite(ONOFF, HIGH);
     }
 
     else if (val == 'y'){
       digitalWrite(ONOFF, LOW);
-    }
-
-    else if (val == 'z'){
+      delay(3000)
       digitalWrite(ONOFF, HIGH);
     }
 

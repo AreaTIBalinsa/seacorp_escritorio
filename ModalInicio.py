@@ -117,11 +117,11 @@ class ModalPrincipal(QMainWindow):
             
         if (event.key() == Qt.Key_1) and self.ui.frmSombra.isVisible():
             self.pulsosArduino.fn_apagarIndicador()
-            os.system("shutdown -s")
+            # os.system("shutdown -s")
         
         if (event.key() == Qt.Key_2) and self.ui.frmSombra.isVisible():
             self.pulsosArduino.fn_apagarIndicador()
-            os.system("shutdown -r")
+            # os.system("shutdown -r")
             
         if (event.key() == Qt.Key_3) and self.ui.frmSombra.isVisible():
             self.ui.frmSombra.setHidden(True)

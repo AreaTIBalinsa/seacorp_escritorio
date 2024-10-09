@@ -192,7 +192,7 @@ class Conectar():
             sql = """
                 SELECT
                     ROW_NUMBER() OVER (ORDER BY p.idPesada DESC) AS num,
-                    IFNULL(CONCAT_WS(' ', nombresEmpleado, apellidoPaternoEmple, apellidoMaternoEmple), '') AS nombreCompleto,
+                    IFNULL(CONCAT(CONCAT_WS(' ', nombresEmpleado, apellidoPaternoEmple, apellidoMaternoEmple), ' - ', p.codigoUsuario), '') AS nombreCompleto,
                     especie,
                     pesoNeto,
                     IFNULL((SELECT SUM(pesoNeto) FROM tb_pesadas WHERE especie = "TALLO SOLO" AND fech_InicioProc = %s AND idProceso = %s AND p.estadoPesada = 1 AND idPesada <= p.idPesada AND codigoUsuario = p.codigoUsuario), 0) AS acumuladoTalloSolo, 
@@ -216,6 +216,36 @@ class Conectar():
                                 fechaInicioProceso, numeroProceso,
                                 fechaInicioProceso, numeroProceso,
                                 fechaInicioProceso, numeroProceso, numeroLote))
+            resultado = cursor.fetchall()
+            cursor.close()
+            return resultado
+        except Exception as e:
+            print("Error al ejecutar la consulta SQL:", e)
+            return None
+    
+    def db_listarPesosTablaEnProceso(self):
+        try:
+            cursor = self.conexionsql.cursor()
+            sql = """
+                SELECT
+                    ROW_NUMBER() OVER (ORDER BY p.idPesada DESC) AS num,
+                    IFNULL(CONCAT(CONCAT_WS(' ', nombresEmpleado, apellidoPaternoEmple, apellidoMaternoEmple), ' - ', p.codigoUsuario), '') AS nombreCompleto,
+                    especie,
+                    pesoNeto,
+                    IFNULL((SELECT SUM(pesoNeto) FROM tb_pesadas WHERE especie = "TALLO SOLO" AND p.estadoPesada = 1 AND idPesada <= p.idPesada AND codigoUsuario = p.codigoUsuario), 0) AS acumuladoTalloSolo, 
+                    IFNULL((SELECT SUM(pesoNeto) FROM tb_pesadas WHERE especie = "TALLO CORAL" AND p.estadoPesada = 1 AND idPesada <= p.idPesada AND codigoUsuario = p.codigoUsuario), 0) AS acumuladoTalloCoral,
+                    IFNULL((SELECT SUM(pesoNeto) FROM tb_pesadas WHERE especie = "MEDIA VALVA T/S" AND p.estadoPesada = 1 AND idPesada <= p.idPesada AND codigoUsuario = p.codigoUsuario), 0) AS acumuladoMediaValvaTalloSolo, 
+                    IFNULL((SELECT SUM(pesoNeto) FROM tb_pesadas WHERE especie = "MEDIA VALVA T/C" AND p.estadoPesada = 1 AND idPesada <= p.idPesada AND codigoUsuario = p.codigoUsuario), 0) AS acumuladoMediaValvaTalloCoral, 
+                    IFNULL((SELECT SUM(pesoNeto) FROM tb_pesadas WHERE especie = "OTROS" AND p.estadoPesada = 1 AND idPesada <= p.idPesada AND codigoUsuario = p.codigoUsuario), 0) AS acumuladoOtros, 
+                    p.horaPeso,
+                    idPesada
+                FROM
+                    tb_pesadas p
+                    INNER JOIN tb_empleados ON p.codigoUsuario = tb_empleados.codigo
+                ORDER BY p.idPesada DESC
+                LIMIT 1
+            """
+            cursor.execute(sql)
             resultado = cursor.fetchall()
             cursor.close()
             return resultado
