@@ -195,40 +195,28 @@ class Conectar():
                     IFNULL(CONCAT(CONCAT_WS(' ', nombresEmpleado, apellidoPaternoEmple, apellidoMaternoEmple), ' - ', p.codigoUsuario), '') AS nombreCompleto,
                     especie,
                     pesoNeto,
-                    acumulados.acumuladoTalloSolo,
-                    acumulados.acumuladoTalloCoral,
-                    acumulados.acumuladoMediaValvaTalloSolo,
-                    acumulados.acumuladoMediaValvaTalloCoral,
-                    acumulados.acumuladoOtros,
+                    IFNULL((SELECT SUM(pesoNeto) FROM tb_pesadas WHERE especie = "TALLO SOLO" AND fech_InicioProc = %s AND idProceso = %s AND p.estadoPesada = 1 AND idPesada <= p.idPesada AND codigoUsuario = p.codigoUsuario), 0) AS acumuladoTalloSolo, 
+                    IFNULL((SELECT SUM(pesoNeto) FROM tb_pesadas WHERE especie = "TALLO CORAL" AND fech_InicioProc = %s AND idProceso = %s AND p.estadoPesada = 1 AND idPesada <= p.idPesada AND codigoUsuario = p.codigoUsuario), 0) AS acumuladoTalloCoral,
+                    IFNULL((SELECT SUM(pesoNeto) FROM tb_pesadas WHERE especie = "MEDIA VALVA T/S" AND fech_InicioProc = %s AND idProceso = %s AND p.estadoPesada = 1 AND idPesada <= p.idPesada AND codigoUsuario = p.codigoUsuario), 0) AS acumuladoMediaValvaTalloSolo, 
+                    IFNULL((SELECT SUM(pesoNeto) FROM tb_pesadas WHERE especie = "MEDIA VALVA T/C" AND fech_InicioProc = %s AND idProceso = %s AND p.estadoPesada = 1 AND idPesada <= p.idPesada AND codigoUsuario = p.codigoUsuario), 0) AS acumuladoMediaValvaTalloCoral, 
+                    IFNULL((SELECT SUM(pesoNeto) FROM tb_pesadas WHERE especie = "OTROS" AND fech_InicioProc = %s AND idProceso = %s AND p.estadoPesada = 1 AND idPesada <= p.idPesada AND codigoUsuario = p.codigoUsuario), 0) AS acumuladoOtros, 
                     p.horaPeso,
-                    p.idPesada
+                    idPesada
                 FROM
                     tb_pesadas p
                     INNER JOIN tb_empleados ON p.codigoUsuario = tb_empleados.codigo
-                    LEFT JOIN (
-                        SELECT 
-                            codigoUsuario,
-                            SUM(CASE WHEN especie = "TALLO SOLO" THEN pesoNeto ELSE 0 END) AS acumuladoTalloSolo,
-                            SUM(CASE WHEN especie = "TALLO CORAL" THEN pesoNeto ELSE 0 END) AS acumuladoTalloCoral,
-                            SUM(CASE WHEN especie = "MEDIA VALVA T/S" THEN pesoNeto ELSE 0 END) AS acumuladoMediaValvaTalloSolo,
-                            SUM(CASE WHEN especie = "MEDIA VALVA T/C" THEN pesoNeto ELSE 0 END) AS acumuladoMediaValvaTalloCoral,
-                            SUM(CASE WHEN especie = "OTROS" THEN pesoNeto ELSE 0 END) AS acumuladoOtros
-                        FROM tb_pesadas
-                        WHERE 
-                            fech_InicioProc = %s 
-                            AND idProceso = %s 
-                            AND estadoPesada = 1
-                        GROUP BY codigoUsuario
-                    ) acumulados ON acumulados.codigoUsuario = p.codigoUsuario
                 WHERE
-                    p.fech_InicioProc = %s 
-                    AND p.idProceso = %s 
-                    AND p.idLote = %s 
-                    AND p.estadoPesada = 1
+                    p.fech_InicioProc = %s AND p.idProceso = %s AND p.idLote = %s AND p.estadoPesada = 1
                 ORDER BY 
                     p.idPesada DESC
+                LIMIT 1
             """
-            cursor.execute(sql, (fechaInicioProceso, numeroProceso, fechaInicioProceso, numeroProceso, numeroLote))
+            cursor.execute(sql, (fechaInicioProceso, numeroProceso,
+                                fechaInicioProceso, numeroProceso,
+                                fechaInicioProceso, numeroProceso,
+                                fechaInicioProceso, numeroProceso,
+                                fechaInicioProceso, numeroProceso,
+                                fechaInicioProceso, numeroProceso, numeroLote))
             resultado = cursor.fetchall()
             cursor.close()
             return resultado
