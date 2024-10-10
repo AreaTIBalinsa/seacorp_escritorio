@@ -1566,7 +1566,7 @@ class AplicacionPrincipal(QMainWindow):
         global listoParaAccionar
         global numeroDePesada
         
-        pesosListarTabla = self.conexion.db_listarPesosTablaEnProceso()
+        pesosListarTabla = self.conexion.db_listarPesosTablaEnProceso(fechaInicioProceso, numeroProceso, numeroLote)
         
         listoParaAccionar = False
         
