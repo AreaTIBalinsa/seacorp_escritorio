@@ -209,7 +209,6 @@ class Conectar():
                     p.fech_InicioProc = %s AND p.idProceso = %s AND p.idLote = %s AND p.estadoPesada = 1
                 ORDER BY 
                     p.idPesada DESC
-                LIMIT 1
             """
             cursor.execute(sql, (fechaInicioProceso, numeroProceso,
                                 fechaInicioProceso, numeroProceso,
