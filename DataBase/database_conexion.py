@@ -156,7 +156,7 @@ class Conectar():
     def db_guardarPesada(self, numeroProceso, numeroLote, presentacion, pesoIndicador, pesoTara, horaPeso, fechaInicioProceso, codigoColaborador, pesoExcedido):
         try:
             cursor = self.conexionsql.cursor()
-            sql = "INSERT INTO tb_pesadas (idProceso ,idLote, especie, pesoNeto, tara, horaPeso, fech_InicioProc, codigoUsuario, pesoExcedido) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)"
+            sql = "INSERT INTO tb_pesadas (idProceso ,idLote, especie, pesoNeto, tara, horaPeso, fech_InicioProc, codigoUsuario, pesoExcedido, fechaReal) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, DATE(NOW()))"
             cursor.execute(sql,(numeroProceso, numeroLote, presentacion, pesoIndicador, pesoTara, horaPeso, fechaInicioProceso, codigoColaborador, pesoExcedido))
             self.conexionsql.commit()
             cursor.close()
@@ -195,18 +195,24 @@ class Conectar():
                     IFNULL(CONCAT(CONCAT_WS(' ', nombresEmpleado, apellidoPaternoEmple, apellidoMaternoEmple), ' - ', p.codigoUsuario), '') AS nombreCompleto,
                     especie,
                     pesoNeto,
-                    IFNULL((SELECT SUM(pesoNeto) FROM tb_pesadas WHERE especie = "TALLO SOLO" AND fech_InicioProc = %s AND idProceso = %s AND p.estadoPesada = 1 AND idPesada <= p.idPesada AND codigoUsuario = p.codigoUsuario), 0) AS acumuladoTalloSolo, 
-                    IFNULL((SELECT SUM(pesoNeto) FROM tb_pesadas WHERE especie = "TALLO CORAL" AND fech_InicioProc = %s AND idProceso = %s AND p.estadoPesada = 1 AND idPesada <= p.idPesada AND codigoUsuario = p.codigoUsuario), 0) AS acumuladoTalloCoral,
-                    IFNULL((SELECT SUM(pesoNeto) FROM tb_pesadas WHERE especie = "MEDIA VALVA T/S" AND fech_InicioProc = %s AND idProceso = %s AND p.estadoPesada = 1 AND idPesada <= p.idPesada AND codigoUsuario = p.codigoUsuario), 0) AS acumuladoMediaValvaTalloSolo, 
-                    IFNULL((SELECT SUM(pesoNeto) FROM tb_pesadas WHERE especie = "MEDIA VALVA T/C" AND fech_InicioProc = %s AND idProceso = %s AND p.estadoPesada = 1 AND idPesada <= p.idPesada AND codigoUsuario = p.codigoUsuario), 0) AS acumuladoMediaValvaTalloCoral, 
-                    IFNULL((SELECT SUM(pesoNeto) FROM tb_pesadas WHERE especie = "OTROS" AND fech_InicioProc = %s AND idProceso = %s AND p.estadoPesada = 1 AND idPesada <= p.idPesada AND codigoUsuario = p.codigoUsuario), 0) AS acumuladoOtros, 
+                    IFNULL((SELECT SUM(pesoNeto) FROM tb_pesadas WHERE especie = "TALLO SOLO" AND fech_InicioProc = %s AND idProceso = %s AND estadoPesada = 1 AND idPesada <= p.idPesada AND codigoUsuario = p.codigoUsuario), 0) AS acumuladoTalloSolo, 
+                    IFNULL((SELECT SUM(pesoNeto) FROM tb_pesadas WHERE especie = "TALLO CORAL" AND fech_InicioProc = %s AND idProceso = %s AND estadoPesada = 1 AND idPesada <= p.idPesada AND codigoUsuario = p.codigoUsuario), 0) AS acumuladoTalloCoral,
+                    IFNULL((SELECT SUM(pesoNeto) FROM tb_pesadas WHERE especie = "MEDIA VALVA T/S" AND fech_InicioProc = %s AND idProceso = %s AND estadoPesada = 1 AND idPesada <= p.idPesada AND codigoUsuario = p.codigoUsuario), 0) AS acumuladoMediaValvaTalloSolo, 
+                    IFNULL((SELECT SUM(pesoNeto) FROM tb_pesadas WHERE especie = "MEDIA VALVA T/C" AND fech_InicioProc = %s AND idProceso = %s AND estadoPesada = 1 AND idPesada <= p.idPesada AND codigoUsuario = p.codigoUsuario), 0) AS acumuladoMediaValvaTalloCoral, 
+                    IFNULL((SELECT SUM(pesoNeto) FROM tb_pesadas WHERE especie = "OTROS" AND fech_InicioProc = %s AND idProceso = %s AND estadoPesada = 1 AND idPesada <= p.idPesada AND codigoUsuario = p.codigoUsuario), 0) AS acumuladoOtros, 
                     p.horaPeso,
-                    idPesada
+                    idPesada,
+                    p.estadoPesada,
+                    IFNULL((SELECT SUM(pesoDescuento) FROM tb_descuentos WHERE especie = "TALLO SOLO" AND fecha = %s AND idProceso = %s AND p.fechaReal >= fechaRealDesc AND p.horaPeso >= hora AND codigoUsuario = p.codigoUsuario), 0) AS descuentoAcumuladoTalloSolo,
+                    IFNULL((SELECT SUM(pesoDescuento) FROM tb_descuentos WHERE especie = "TALLO CORAL" AND fecha = %s AND idProceso = %s AND p.fechaReal >= fechaRealDesc AND p.horaPeso >= hora AND codigoUsuario = p.codigoUsuario), 0) AS descuentoAcumuladoTalloCoral,
+                    IFNULL((SELECT SUM(pesoDescuento) FROM tb_descuentos WHERE especie = "MEDIA VALVA T/S" AND fecha = %s AND idProceso = %s AND p.fechaReal >= fechaRealDesc AND p.horaPeso >= hora AND codigoUsuario = p.codigoUsuario), 0) AS descuentoAcumuladoMediaValvaTalloSolo,
+                    IFNULL((SELECT SUM(pesoDescuento) FROM tb_descuentos WHERE especie = "MEDIA VALVA T/C" AND fecha = %s AND idProceso = %s AND p.fechaReal >= fechaRealDesc AND p.horaPeso >= hora AND codigoUsuario = p.codigoUsuario), 0) AS descuentoAcumuladoMediaValvaTalloCoral,
+                    IFNULL((SELECT SUM(pesoDescuento) FROM tb_descuentos WHERE especie = "OTROS" AND fecha = %s AND idProceso = %s AND p.fechaReal >= fechaRealDesc AND p.horaPeso >= hora AND codigoUsuario = p.codigoUsuario), 0) AS descuentoAcumuladoOtros
                 FROM
                     tb_pesadas p
                     INNER JOIN tb_empleados ON p.codigoUsuario = tb_empleados.codigo
                 WHERE
-                    p.fech_InicioProc = %s AND p.idProceso = %s AND p.idLote = %s AND p.estadoPesada = 1
+                    p.fech_InicioProc = %s AND p.idProceso = %s AND p.idLote = %s
                 ORDER BY 
                     p.idPesada DESC
             """
@@ -215,6 +221,13 @@ class Conectar():
                                 fechaInicioProceso, numeroProceso,
                                 fechaInicioProceso, numeroProceso,
                                 fechaInicioProceso, numeroProceso,
+                                
+                                fechaInicioProceso, numeroProceso,
+                                fechaInicioProceso, numeroProceso,
+                                fechaInicioProceso, numeroProceso,
+                                fechaInicioProceso, numeroProceso,
+                                fechaInicioProceso, numeroProceso,
+                                
                                 fechaInicioProceso, numeroProceso, numeroLote))
             resultado = cursor.fetchall()
             cursor.close()
@@ -238,18 +251,24 @@ class Conectar():
                     acumulados.acumuladoMediaValvaTalloCoral,
                     acumulados.acumuladoOtros,
                     p.horaPeso,
-                    p.idPesada
+                    p.idPesada,
+                    p.estadoPesada,
+                    COALESCE(acumuladosDesc.descuentoAcumuladoTalloSolo, 0) AS descuentoAcumuladoTalloSolo,
+                    COALESCE(acumuladosDesc.descuentoAcumuladoTalloCoral, 0) AS descuentoAcumuladoTalloCoral,
+                    COALESCE(acumuladosDesc.descuentoAcumuladoMediaValvaTalloSolo, 0) AS descuentoAcumuladoMediaValvaTalloSolo,
+                    COALESCE(acumuladosDesc.descuentoAcumuladoMediaValvaTalloCoral, 0) AS descuentoAcumuladoMediaValvaTalloCoral,
+                    COALESCE(acumuladosDesc.descuentoAcumuladoOtros, 0) AS descuentoAcumuladoOtros
                 FROM
                     tb_pesadas p
                     INNER JOIN tb_empleados ON p.codigoUsuario = tb_empleados.codigo
                     LEFT JOIN (
                         SELECT 
                             codigoUsuario,
-                            SUM(CASE WHEN especie = "TALLO SOLO" THEN pesoNeto ELSE 0 END) AS acumuladoTalloSolo,
-                            SUM(CASE WHEN especie = "TALLO CORAL" THEN pesoNeto ELSE 0 END) AS acumuladoTalloCoral,
-                            SUM(CASE WHEN especie = "MEDIA VALVA T/S" THEN pesoNeto ELSE 0 END) AS acumuladoMediaValvaTalloSolo,
-                            SUM(CASE WHEN especie = "MEDIA VALVA T/C" THEN pesoNeto ELSE 0 END) AS acumuladoMediaValvaTalloCoral,
-                            SUM(CASE WHEN especie = "OTROS" THEN pesoNeto ELSE 0 END) AS acumuladoOtros
+                            COALESCE(SUM(CASE WHEN especie = "TALLO SOLO" THEN pesoNeto ELSE 0 END), 0) AS acumuladoTalloSolo,
+                            COALESCE(SUM(CASE WHEN especie = "TALLO CORAL" THEN pesoNeto ELSE 0 END), 0) AS acumuladoTalloCoral,
+                            COALESCE(SUM(CASE WHEN especie = "MEDIA VALVA T/S" THEN pesoNeto ELSE 0 END), 0) AS acumuladoMediaValvaTalloSolo,
+                            COALESCE(SUM(CASE WHEN especie = "MEDIA VALVA T/C" THEN pesoNeto ELSE 0 END), 0) AS acumuladoMediaValvaTalloCoral,
+                            COALESCE(SUM(CASE WHEN especie = "OTROS" THEN pesoNeto ELSE 0 END), 0) AS acumuladoOtros
                         FROM tb_pesadas
                         WHERE 
                             fech_InicioProc = %s 
@@ -257,6 +276,20 @@ class Conectar():
                             AND estadoPesada = 1
                         GROUP BY codigoUsuario
                     ) acumulados ON acumulados.codigoUsuario = p.codigoUsuario
+                    LEFT JOIN (
+                        SELECT 
+                            codigoUsuario,
+                            COALESCE(SUM(CASE WHEN especie = "TALLO SOLO" THEN pesoDescuento ELSE 0 END), 0) AS descuentoAcumuladoTalloSolo,
+                            COALESCE(SUM(CASE WHEN especie = "TALLO CORAL" THEN pesoDescuento ELSE 0 END), 0) AS descuentoAcumuladoTalloCoral,
+                            COALESCE(SUM(CASE WHEN especie = "MEDIA VALVA T/S" THEN pesoDescuento ELSE 0 END), 0) AS descuentoAcumuladoMediaValvaTalloSolo,
+                            COALESCE(SUM(CASE WHEN especie = "MEDIA VALVA T/C" THEN pesoDescuento ELSE 0 END), 0) AS descuentoAcumuladoMediaValvaTalloCoral,
+                            COALESCE(SUM(CASE WHEN especie = "OTROS" THEN pesoDescuento ELSE 0 END), 0) AS descuentoAcumuladoOtros
+                        FROM tb_descuentos
+                        WHERE 
+                            fecha = %s 
+                            AND idProceso = %s
+                        GROUP BY codigoUsuario
+                    ) acumuladosDesc ON acumuladosDesc.codigoUsuario = p.codigoUsuario
                 WHERE
                     p.fech_InicioProc = %s 
                     AND p.idProceso = %s 
@@ -266,7 +299,7 @@ class Conectar():
                     p.idPesada DESC
                 LIMIT 1
             """
-            cursor.execute(sql, (fechaInicioProceso, numeroProceso, fechaInicioProceso, numeroProceso, numeroLote))
+            cursor.execute(sql, (fechaInicioProceso, numeroProceso, fechaInicioProceso, numeroProceso, fechaInicioProceso, numeroProceso, numeroLote))
             resultado = cursor.fetchall()
             cursor.close()
             return resultado
@@ -321,7 +354,7 @@ class Conectar():
     def db_aplicarDescuentoPersonal(self, numeroProceso, numeroLote, fechaInicioProceso, horaDescuento, presentacionDescuento, txtIngresarPesoDescuento, codigoColaboradorDescuento):
         try:
             cursor = self.conexionsql.cursor()
-            sql = "INSERT INTO tb_descuentos (idProceso , idLote, fecha, hora, especie, pesoDescuento, codigoUsuario) VALUES (%s, %s, %s, %s, %s, %s, %s)"
+            sql = "INSERT INTO tb_descuentos (idProceso , idLote, fecha, hora, especie, pesoDescuento, codigoUsuario, fechaRealDesc) VALUES (%s, %s, %s, %s, %s, %s, %s, DATE(NOW()))"
             cursor.execute(sql,(numeroProceso, numeroLote, fechaInicioProceso, horaDescuento, presentacionDescuento, txtIngresarPesoDescuento, codigoColaboradorDescuento))
             self.conexionsql.commit()
             cursor.close()

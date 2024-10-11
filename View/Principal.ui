@@ -648,7 +648,37 @@ color: #000;
       </column>
       <column>
        <property name="text">
-        <string>ID Pesada</string>
+        <string>idPesada</string>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>estadoPesada</string>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>descuentoTalloSolo</string>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>descuentoTalloCoral</string>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>descuentoMediaValvaTalloSolo</string>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>descuentoMediaValvaTalloCoral</string>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>descuentoOtros</string>
        </property>
       </column>
      </widget>

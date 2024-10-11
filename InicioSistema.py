@@ -389,6 +389,12 @@ class AplicacionPrincipal(QMainWindow):
             self.tablaDePesos.setColumnWidth(8, 100)
             self.tablaDePesos.setColumnWidth(9, 80)
             self.tablaDePesos.setColumnHidden(10, True)
+            self.tablaDePesos.setColumnHidden(11, True)
+            self.tablaDePesos.setColumnHidden(12, True)
+            self.tablaDePesos.setColumnHidden(13, True)
+            self.tablaDePesos.setColumnHidden(14, True)
+            self.tablaDePesos.setColumnHidden(15, True)
+            self.tablaDePesos.setColumnHidden(16, True)
             
             # self.conexion.db_actualizar_datos_local_colaboradores()
             # self.workerBase = WorkerThreadSubirDatosBase()
@@ -800,7 +806,8 @@ class AplicacionPrincipal(QMainWindow):
                 frmIngresarPassword = False
                 self.ui.frmSombra.setHidden(True)
                 self.ui.frmIngresarPassword.setHidden(True)
-                self.fn_listarPesadas()
+                self.fn_eliminaPesadaEnProceso(idPesadaEditarOEliminar)
+                # self.fn_listarPesadas()
             else:
                 self.fn_alerta("¡CONTRASEÑA INCORRECTA!",error,"La contraseña no coincide con la contraseña declara para eliminar.")
                 
@@ -1180,6 +1187,16 @@ class AplicacionPrincipal(QMainWindow):
 
                 self.tablaDePesos.setItem(fila, 2, item_col_1)
                 break
+            
+    def fn_eliminaPesadaEnProceso(self, idPesadaEditarOEliminar):
+        row_count = self.tablaDePesos.rowCount()
+
+        for fila in range(row_count):
+            item_col_10 = self.tablaDePesos.item(fila, 10)
+
+            if item_col_10 is not None and item_col_10.text() == str(idPesadaEditarOEliminar):
+                self.fn_pintarCeldasRegistrosEliminados(fila)
+                break
     
     def fn_recepcionaCodigoColaborador(self):
         global codigoColaborador
@@ -1542,15 +1559,15 @@ class AplicacionPrincipal(QMainWindow):
                             if column_number == 3:  # Columna de "Peso Neto"
                                 data = "{:.3f}".format(data)
                             if column_number == 4:  # Columna de "TALLO SOLO"
-                                data = "{:.3f}".format(data)
+                                data = "{:.3f}".format(data - row_data[12])
                             if column_number == 5:  # Columna de "TALLO CORAL"
-                                data = "{:.3f}".format(data)
+                                data = "{:.3f}".format(data - row_data[13])
                             if column_number == 6:  # Columna de "MEDIA VALVA TALLO SOLO"
-                                data = "{:.3f}".format(data)
+                                data = "{:.3f}".format(data - row_data[14])
                             if column_number == 7:  # Columna de "MEDIA VALVA TALLO CORAL"
-                                data = "{:.3f}".format(data)
+                                data = "{:.3f}".format(data - row_data[15])
                             if column_number == 8:  # Columna de "OTROS"
-                                data = "{:.3f}".format(data)
+                                data = "{:.3f}".format(data - row_data[16])
                             if column_number == 9 :  # Columna de "Hora Peso"
                                 hours, remainder = divmod(data.seconds, 3600)
                                 minutes, seconds = divmod(remainder, 60)
@@ -1559,6 +1576,16 @@ class AplicacionPrincipal(QMainWindow):
                             item = QTableWidgetItem(str(data))
                             item.setTextAlignment(Qt.AlignCenter)
                             self.tablaDePesos.setItem(row_number, column_number, item)
+                            
+                        if (int(row_data[11]) == 0):
+                            self.fn_pintarCeldasRegistrosEliminados(row_number)
+                            
+    def fn_pintarCeldasRegistrosEliminados(self, row):
+        tablaDePesos = self.ui.tblDetallePesadas
+        for e in range(tablaDePesos.columnCount()):
+            item = tablaDePesos.item(row, e)
+            item.setBackground(QColor(255, 51, 51))
+            item.setForeground(QColor(255, 255, 255))
                             
     def fn_listarPesadasEnProceso(self):
         global acumuladoProceso
@@ -1593,15 +1620,15 @@ class AplicacionPrincipal(QMainWindow):
                                 data = "{:.3f}".format(data)
                                 
                             if column_number == 4:  # Columna de "TALLO SOLO"
-                                data = "{:.3f}".format(data)
+                                data = "{:.3f}".format(data - row_data[12])
                             if column_number == 5:  # Columna de "TALLO CORAL"
-                                data = "{:.3f}".format(data)
+                                data = "{:.3f}".format(data - row_data[13])
                             if column_number == 6:  # Columna de "MEDIA VALVA TALLO SOLO"
-                                data = "{:.3f}".format(data)
+                                data = "{:.3f}".format(data - row_data[14])
                             if column_number == 7:  # Columna de "MEDIA VALVA TALLO CORAL"
-                                data = "{:.3f}".format(data)
+                                data = "{:.3f}".format(data - row_data[15])
                             if column_number == 8:  # Columna de "OTROS"
-                                data = "{:.3f}".format(data)
+                                data = "{:.3f}".format(data - row_data[16])
                             if column_number == 9 :  # Columna de "Hora Peso"
                                 hours, remainder = divmod(data.seconds, 3600)
                                 minutes, seconds = divmod(remainder, 60)
